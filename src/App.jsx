@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
 
 import Navigation from './components/Navigation';
 import SimpleNav from './components/SimpleNav';
@@ -12,37 +11,6 @@ import Resume from './components/Resume';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import StarBackground from './components/StarBackground'; 
-
-const GlobalStyle = createGlobalStyle`
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Roboto Mono', monospace;
-    background-color: #000;
-    color: #d4d4d4;
-    overflow-x: hidden;
-  }
-  
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  section {
-    min-height: 100vh;
-    padding: 100px 0;
-    position: relative;
-  }
-`;
-
-const ContentWrapper = styled.div`
-  position: relative;
-  z-index: 1;
-`;
 
 function App() {
   const [showNavigation, setShowNavigation] = useState(true);
@@ -71,8 +39,6 @@ function App() {
   
   return (
     <Router>
-      <GlobalStyle />
-      
       {/* Star Background */}
       <StarBackground />
       
@@ -90,7 +56,7 @@ function App() {
         <Route path="/contact" element={<SimpleNav />} />
       </Routes>
       
-      <ContentWrapper>
+      <div className="relative z-1">
         <Routes>
           <Route path="/" element={<Hero />} />
           <Route path="/about" element={<About />} />
@@ -102,7 +68,7 @@ function App() {
         </Routes>
         
         <Footer />
-      </ContentWrapper>
+      </div>
     </Router>
   );
 }

@@ -1,13 +1,76 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import 'tailwindcss';
+
+@theme {
+  --font-mono: 'Roboto Mono', monospace;
+
+  --color-gold: #d4af37;
+  --color-gold-bright: #ffd700;
+  --color-gold-deep: #a98c37;
+  --color-cream: #fff8e1;
+
+  --color-ink: #d4d4d4;
+  --color-silver: #c0c0c0;
+  --color-muted: #a0a0a0;
+  --color-line: #333333;
+
+  --color-space: #000000;
+  --color-space-deep: #050510;
+  --color-surface: #1b1b1b;
+  --color-surface-deep: #0c0c0c;
+  --color-panel: #111111;
+
+  --color-emerald: #00e676;
+  --color-coral: #ff6b6b;
+  --color-github: #2464eb;
+  --color-linkedin: #0077b5;
+
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-fade-in-up: fade-in-up 2s ease-out;
+  --animate-pulse-soft: pulse-soft 4s ease-in-out infinite;
+  --animate-scroll-down: scroll-down 2s infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 0.9; transform: translateY(0); }
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes scroll-down {
+    0% { opacity: 0; transform: rotate(45deg) translate(-5px, -5px); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: rotate(45deg) translate(5px, 5px); }
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@keyframes star-drift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-2000px); }
+}
+
+@keyframes item-float {
+  0%, 100% { transform: translateY(var(--float-min)) scale(1); }
+  50% { transform: translateY(var(--float-max)) scale(1.05); }
+}
+
+@layer base {
+  html {
+    line-height: normal;
+  }
+
+  body {
+    @apply bg-space font-mono text-ink overflow-x-hidden;
+  }
+
+  section {
+    @apply relative min-h-screen py-[100px];
+  }
 }

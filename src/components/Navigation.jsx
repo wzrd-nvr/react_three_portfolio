@@ -3,263 +3,20 @@ import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Sphere, Stars, Html } from '@react-three/drei';
 import { useNavigate, Link } from 'react-router-dom';
 import * as THREE from 'three';
-import styled from 'styled-components';
 
-const NavigationContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  z-index: 10;
-  background: #000; /* Dark background */
-`;
+const hintClass =
+  'bg-surface/80 text-white px-[18px] py-3 rounded-lg border border-gold/50 backdrop-blur-[10px] text-[0.9rem] shadow-[0_5px_15px_rgba(0,0,0,0.4)] transition-all duration-500 ease-[ease]';
+const hintVisibility = (show) =>
+  show ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2.5 pointer-events-none';
 
-const HeroContent = styled.div`
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  z-index: 5;
-  
-  h1 {
-    font-size: 4rem;
-    color: #d4af37;
-    margin-bottom: 1rem;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    
-    @media (max-width: 768px) {
-      font-size: 3rem;
-    }
-  }
-  
-  p {
-    font-size: 1.5rem;
-    color: #ffffff;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    
-    @media (max-width: 768px) {
-      font-size: 1.2rem;
-    }
-  }
-`;
-
-const TopContent = styled(HeroContent)`
-  top: 10%;
-  
-  h1 {
-    font-size: 5rem;
-    background: linear-gradient(45deg, #d4af37, #FFF8E1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: float 4s ease-in-out infinite;
-    
-    @media (max-width: 768px) {
-      font-size: 3.5rem;
-    }
-  }
-  
-  @keyframes float {
-    0% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-15px);
-    }
-    100% {
-      transform: translateY(0px);
-    }
-  }
-`;
-
-const BottomContent = styled(HeroContent)`
-  bottom: 15%;
-  
-  p {
-    font-size: 1.8rem;
-    font-weight: 300;
-    letter-spacing: 2px;
-    color: #e0e0e0;
-    text-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-    opacity: 0.9;
-    max-width: 800px;
-    margin: 0 auto;
-    animation: fadeInUp 2s ease-out, pulse 4s ease-in-out infinite;
-    
-    @media (max-width: 768px) {
-      font-size: 1.4rem;
-    }
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 0.9;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes pulse {
-    0% {
-      opacity: 0.9;
-    }
-    50% {
-      opacity: 0.7;
-    }
-    100% {
-      opacity: 0.9;
-    }
-  }
-`;
-
-// New UI Help Components
-const HelpContainer = styled.div`
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  z-index: 15;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 280px;
-`;
-
-const NavigationHint = styled.div`
-  background: rgba(27, 27, 27, 0.8);
-  color: #fff;
-  padding: 12px 18px;
-  border-radius: 8px;
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  backdrop-filter: blur(10px);
-  font-size: 0.9rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-  opacity: ${props => (props.show ? '1' : '0')};
-  transform: translateY(${props => (props.show ? '0' : '-10px')});
-  transition: all 0.5s ease;
-  pointer-events: ${props => (props.show ? 'auto' : 'none')};
-  
-  svg {
-    margin-right: 8px;
-    vertical-align: middle;
-  }
-  
-  span {
-    color: #d4af37;
-    font-weight: bold;
-  }
-  
-  p {
-    margin: 5px 0 0;
-    font-size: 0.8rem;
-    opacity: 0.8;
-  }
-`;
-
-const HelpIcon = styled.button`
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(27, 27, 27, 0.8);
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  color: #d4af37;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-  cursor: pointer;
-  z-index: 20;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(212, 175, 55, 0.3);
-    transform: scale(1.1);
-  }
-`;
-
-const ClickHint = styled(NavigationHint)`
-  margin-top: 2px;
-  text-align: center;
-`;
-
-const SimpleNavDropdown = styled.div`
-  position: absolute;
-  top: 30px;
-  right: 30px;
-  z-index: 20;
-`;
-
-const DropdownButton = styled.button`
-  background: rgba(27, 27, 27, 0.8);
-  color: #d4af37;
-  padding: 10px 15px;
-  border-radius: 5px;
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  backdrop-filter: blur(10px);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(212, 175, 55, 0.3);
-  }
-  
-  svg {
-    transition: transform 0.3s ease;
-    transform: ${props => props.isOpen ? 'rotate(180deg)' : 'rotate(0)'};
-  }
-`;
-
-const DropdownContent = styled.div`
-  position: absolute;
-  top: 45px;
-  right: 0;
-  background: rgba(27, 27, 27, 0.95);
-  border-radius: 5px;
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  backdrop-filter: blur(10px);
-  width: 150px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  opacity: ${props => (props.isOpen ? '1' : '0')};
-  transform: translateY(${props => (props.isOpen ? '0' : '-10px')});
-  pointer-events: ${props => (props.isOpen ? 'auto' : 'none')};
-  transition: all 0.3s ease;
-  z-index: 25;
-`;
-
-const DropdownItem = styled(Link)`
-  display: block;
-  padding: 12px 15px;
-  color: #fff;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: ${props => props.hovercolor ? `${props.hovercolor}33` : 'rgba(212, 175, 55, 0.3)'};
-    color: ${props => props.hovercolor || '#d4af37'};
-  }
-`;
-
-const ExternalDropdownItem = styled.a`
-  display: block;
-  padding: 12px 15px;
-  color: #fff;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: ${props => props.hovercolor ? `${props.hovercolor}33` : 'rgba(212, 175, 55, 0.3)'};
-    color: ${props => props.hovercolor || '#d4af37'};
-  }
-`;
+const dropdownItemClass = 'block px-[15px] py-3 text-white transition-all duration-200 ease-[ease]';
+const hoverClasses = {
+  gold: 'hover:bg-gold/20 hover:text-gold',
+  emerald: 'hover:bg-emerald/20 hover:text-emerald',
+  coral: 'hover:bg-coral/20 hover:text-coral',
+  github: 'hover:bg-github/20 hover:text-github',
+  linkedin: 'hover:bg-linkedin/20 hover:text-linkedin',
+};
 
 // Earth with continents and navigation points
 const Earth = ({ setHoveredSection }) => {
@@ -585,51 +342,65 @@ const Navigation = () => {
   }, []);
   
   return (
-    <NavigationContainer>
-      <TopContent>
-        <h1>Angel Nivar</h1>
-      </TopContent>
+    <div className="fixed top-0 left-0 w-full h-screen z-10 bg-space">
+      <div className="absolute w-full text-center z-5 top-[10%]">
+        <h1 className="text-[5rem] max-md:text-[3.5rem] font-bold mb-4 bg-linear-45/srgb from-gold to-cream bg-clip-text text-transparent text-shadow-[0_0_10px_rgba(0,0,0,0.5)] animate-float">
+          Angel Nivar
+        </h1>
+      </div>
       
       {/* Help button to toggle tooltip */}
-      <HelpIcon onClick={() => setShowHelpTooltip(!showHelpTooltip)}>?</HelpIcon>
+      <button
+        className="absolute top-[30px] left-[30px] size-10 rounded-full bg-surface/80 border border-gold/50 text-gold flex justify-center items-center font-sans text-[20px] leading-[normal] cursor-pointer z-20 transition-all duration-300 ease-[ease] hover:bg-gold/30 hover:scale-110"
+        onClick={() => setShowHelpTooltip(!showHelpTooltip)}
+      >
+        ?
+      </button>
       
       {/* Help tooltips in a container */}
-      <HelpContainer>
-        <NavigationHint show={showHelpTooltip}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#d4af37" viewBox="0 0 16 16">
+      <div className="absolute top-[30px] left-[30px] z-15 flex flex-col gap-2 max-w-[280px]">
+        <div className={`${hintClass} ${hintVisibility(showHelpTooltip)}`}>
+          <svg className="inline mr-2 align-middle" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#d4af37" viewBox="0 0 16 16">
             <path d="M6.5 1.75a.75.75 0 0 0-1.5 0V8a.75.75 0 0 0 1.5 0V1.75zm3.5 0a.75.75 0 0 0-1.5 0V8a.75.75 0 0 0 1.5 0V1.75zm3.5 0a.75.75 0 0 0-1.5 0V8a.75.75 0 0 0 1.5 0V1.75zM13.25 9a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5h10.5zM2.75 12a.75.75 0 0 0 0 1.5h10.5a.75.75 0 0 0 0-1.5H2.75z"/>
           </svg>
-          <span>Click and drag</span> to rotate the globe for navigation
-          <p>Use the mouse wheel to zoom in/out</p>
-        </NavigationHint>
+          <span className="text-gold font-bold">Click and drag</span> to rotate the globe for navigation
+          <p className="mt-[5px] text-[0.8rem] opacity-80">Use the mouse wheel to zoom in/out</p>
+        </div>
         
         {/* Click hint for navigation points */}
-        <ClickHint show={showHelpTooltip}>
+        <div className={`${hintClass} ${hintVisibility(showHelpTooltip)} mt-[2px] text-center`}>
           Click on the colored spheres to navigate to different sections
-        </ClickHint>
-      </HelpContainer>
+        </div>
+      </div>
       
       {/* Simple dropdown navigation */}
-      <SimpleNavDropdown>
-        <DropdownButton 
-          isOpen={dropdownOpen} 
+      <div className="absolute top-[30px] right-[30px] z-20">
+        <button
+          className="bg-surface/80 text-gold px-[15px] py-2.5 rounded-[5px] border border-gold/50 backdrop-blur-[10px] cursor-pointer flex items-center gap-[5px] font-sans text-[13.333px] leading-[normal] transition-all duration-300 ease-[ease] hover:bg-gold/30"
           onClick={() => setDropdownOpen(!dropdownOpen)}
         >
           Menu
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <svg
+            className={`transition-transform duration-300 ease-[ease] ${dropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+            xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+          >
             <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
           </svg>
-        </DropdownButton>
-        <DropdownContent isOpen={dropdownOpen}>
-          <DropdownItem to="/about" hovercolor="#d4af37">About</DropdownItem>
-          <DropdownItem to="/projects" hovercolor="#d4af37">Projects</DropdownItem>
-          <DropdownItem to="/goals" hovercolor="#00e676">Goals</DropdownItem>
-          <DropdownItem to="/resume" hovercolor="#00e676">Resume</DropdownItem>
-          <DropdownItem to="/contact" hovercolor="#ff6b6b">Contact</DropdownItem>
-          <ExternalDropdownItem href="https://github.com/Lactoseandtolerance" target="_blank" rel="noopener noreferrer" hovercolor="#2464eb">GitHub</ExternalDropdownItem>
-          <ExternalDropdownItem href="https://www.linkedin.com/in/angel-nivar-a00740275/" target="_blank" rel="noopener noreferrer" hovercolor="#0077b5">LinkedIn</ExternalDropdownItem>
-        </DropdownContent>
-      </SimpleNavDropdown>
+        </button>
+        <div
+          className={`absolute top-[45px] right-0 bg-surface/95 rounded-[5px] border border-gold/50 backdrop-blur-[10px] w-[150px] shadow-[0_5px_15px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-300 ease-[ease] z-25 ${
+            dropdownOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2.5 pointer-events-none'
+          }`}
+        >
+          <Link to="/about" className={`${dropdownItemClass} ${hoverClasses.gold}`}>About</Link>
+          <Link to="/projects" className={`${dropdownItemClass} ${hoverClasses.gold}`}>Projects</Link>
+          <Link to="/goals" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Goals</Link>
+          <Link to="/resume" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Resume</Link>
+          <Link to="/contact" className={`${dropdownItemClass} ${hoverClasses.coral}`}>Contact</Link>
+          <a href="https://github.com/Lactoseandtolerance" target="_blank" rel="noopener noreferrer" className={`${dropdownItemClass} ${hoverClasses.github}`}>GitHub</a>
+          <a href="https://www.linkedin.com/in/angel-nivar-a00740275/" target="_blank" rel="noopener noreferrer" className={`${dropdownItemClass} ${hoverClasses.linkedin}`}>LinkedIn</a>
+        </div>
+      </div>
       
       <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
         <Earth setHoveredSection={setHoveredSection} />
@@ -645,10 +416,12 @@ const Navigation = () => {
         />
       </Canvas>
       
-      <BottomContent>
-        <p>Exploring the infinite possibilities of technology</p>
-      </BottomContent>
-    </NavigationContainer>
+      <div className="absolute w-full text-center z-5 bottom-[15%]">
+        <p className="text-[1.8rem] max-md:text-[1.4rem] font-light tracking-[2px] text-[#e0e0e0] text-shadow-[0_0_15px_rgba(0,0,0,0.8)] opacity-90 max-w-[800px] mx-auto animate-[fade-in-up_2s_ease-out,pulse-soft_4s_ease-in-out_infinite]">
+          Exploring the infinite possibilities of technology
+        </p>
+      </div>
+    </div>
   );
 };
 

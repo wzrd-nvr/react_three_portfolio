@@ -1,283 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
 
-// Main section with scroll enabled
-const AboutSection = styled.section`
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
-  background-color: #0c0c0c;
-  scrollbar-width: thin;
-  scrollbar-color: #333 #0c0c0c;
-  
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: #0c0c0c;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background-color: #333;
-    border-radius: 6px;
-  }
-`;
+const paragraphClass = 'text-[1.2rem] leading-[1.8] mb-6 text-ink';
 
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-  padding: 0 20px;
-`;
+const shineClass =
+  "before:content-[''] before:absolute before:top-0 before:-left-full before:w-full before:h-full before:bg-linear-to-r/srgb before:from-transparent before:to-transparent before:transition-[left] before:ease-[ease] hover:before:left-full";
 
-const SectionTitle = styled.h2`
-  font-size: 3rem;
-  color: #d4af37;
-  margin-bottom: 2rem;
-  text-align: center;
-  padding-top: 80px;
-  
-  @media (max-width: 768px) {
-    font-size: 2.5rem;
-  }
-`;
+const itemBoxClass =
+  "relative h-(--box-height) max-md:h-(--box-height-mobile) overflow-hidden rounded-[10px] shadow-[0_10px_25px_rgba(0,0,0,0.4)] animate-[item-float_var(--float-duration)_ease-in-out_infinite] [animation-delay:var(--float-delay)] cursor-pointer after:content-[''] after:absolute after:inset-0 after:bg-linear-to-b/srgb after:from-transparent after:from-70% after:to-black/70 after:z-1";
 
-const AboutContent = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 3rem;
-  
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const AboutText = styled.div`
-  p {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-    color: #d4d4d4;
-  }
-`;
-
-// Enhanced skills container with grid layout
-const SkillsContainer = styled.div`
-  background: rgba(17, 17, 17, 0.7);
-  border-radius: 10px;
-  padding: 2rem;
-  border: 1px solid #333;
-  position: relative;
-  min-height: 300px;
-`;
-
-const SkillsTitle = styled.h3`
-  font-size: 1.8rem;
-  color: #d4af37;
-  margin-bottom: 1.5rem;
-`;
-
-const SkillsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const SkillBubble = styled.div`
-  background: #1b1b1b;
-  color: #fff;
-  border: 1px solid #d4af37;
-  border-radius: 10px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 0.9rem;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transform-origin: center;
-  cursor: pointer;
-  height: 45px;
-  position: relative;
-  overflow: hidden;
-  
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg, 
-      transparent, 
-      rgba(212, 175, 55, 0.2), 
-      transparent
-    );
-    transition: left 0.5s ease;
-  }
-  
-  &:hover {
-    transform: scale(1.1);
-    background: #d4af37;
-    color: #000;
-    z-index: 10;
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-    
-    &:before {
-      left: 100%;
-    }
-  }
-`;
-
-const EducationCard = styled.div`
-  background: linear-gradient(135deg, rgba(17, 17, 17, 0.9) 0%, rgba(27, 27, 27, 0.8) 100%);
-  border: 2px solid #d4af37;
-  border-radius: 12px;
-  padding: 2.5rem;
-  margin-top: 2rem;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
-    transition: left 0.6s ease;
-  }
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.25);
-    
-    &:before {
-      left: 100%;
-    }
-  }
-`;
-
-const EducationTitle = styled.h3`
-  font-size: 1.6rem;
-  color: #d4af37;
-  margin: 0 0 0.8rem 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const EducationSchool = styled.p`
-  font-size: 1.1rem;
-  color: #ffd700;
-  margin: 0.5rem 0;
-  font-weight: 600;
-`;
-
-const EducationDegree = styled.p`
-  font-size: 1rem;
-  color: #d4d4d4;
-  margin: 0.3rem 0;
-  line-height: 1.5;
-`;
-
-const EducationDate = styled.p`
-  font-size: 0.95rem;
-  color: #a0a0a0;
-  margin-top: 1rem;
-  font-style: italic;
-`;
-
-const SectionDivider = styled.div`
-  margin: 5rem 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #333, transparent);
-`;
-
-// Common grid layout for Fashion and Decor items
-const ItemsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: minmax(250px, auto);
-  gap: 1.5rem;
-  margin: 3rem 0;
-  
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-`;
-
-const randomFloatAnimation = (min, max) => keyframes`
-  0% { transform: translateY(${min}px) scale(1); }
-  50% { transform: translateY(${max}px) scale(1.05); }
-  100% { transform: translateY(${min}px) scale(1); }
-`;
-
-const ItemBox = styled.div`
-  position: relative;
-  height: ${props => props.height || '350px'};
-  overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-  animation: ${props => randomFloatAnimation(props.minFloat || -5, props.maxFloat || 5)} 
-    ${props => props.animationDuration || '8s'} 
-    ease-in-out infinite;
-  animation-delay: ${props => props.animationDelay || '0s'};
-  
-  &:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      to bottom,
-      transparent 70%,
-      rgba(0, 0, 0, 0.7)
-    );
-    z-index: 1;
-  }
-  
-  @media (max-width: 768px) {
-    height: ${props => props.mobileHeight || '250px'};
-  }
-`;
-
-const ItemImage = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  transition: opacity 1.2s ease-in-out;
-  opacity: ${props => props.active ? '1' : '0'};
-`;
-
-// Overlay when an image is clicked to enlarge
-const ImageOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 15;
-  display: ${props => props.visible ? 'block' : 'none'};
-  cursor: pointer;
-`;
+const itemBoxStyle = (item) => ({
+  '--box-height': item.height,
+  '--box-height-mobile': item.mobileHeight,
+  '--float-min': `${item.minFloat}px`,
+  '--float-max': `${item.maxFloat}px`,
+  '--float-duration': item.animationDuration,
+  '--float-delay': item.animationDelay,
+});
 
 // Individual image component with state-based transitions
 const SlidingImages = ({ images, boxIndex, imageType }) => {
@@ -301,9 +39,9 @@ const SlidingImages = ({ images, boxIndex, imageType }) => {
   return (
     <>
       {images.map((image, imageIndex) => (
-        <ItemImage
+        <div
           key={imageIndex}
-          active={imageIndex === activeIndex}
+          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-[1200ms] ease-[ease-in-out] ${imageIndex === activeIndex ? 'opacity-100' : 'opacity-0'}`}
           style={{ backgroundImage: `url(/images/${image})` }}
         />
       ))}
@@ -515,36 +253,40 @@ const About = () => {
   };
   
   return (
-    <AboutSection id="about">
-      <Container>
-        <SectionTitle>About Me</SectionTitle>
+    <section
+      id="about"
+      className="h-screen overflow-y-auto overflow-x-hidden relative bg-surface-deep [scrollbar-width:thin] [scrollbar-color:var(--color-line)_var(--color-surface-deep)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-surface-deep [&::-webkit-scrollbar-thumb]:bg-line [&::-webkit-scrollbar-thumb]:rounded-md"
+    >
+      <div className="max-w-[1200px] mx-auto relative z-1 px-5">
+        <h2 className="text-[3rem] font-bold text-gold mb-8 text-center pt-20 max-md:text-[2.5rem]">About Me</h2>
         
-        <AboutContent>
-          <AboutText>
-            <p>
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+          <div>
+            <p className={paragraphClass}>
               I'm a passionate developer with skills in a variety of technologies.
               I enjoy getting lost in learning and applying my skills to the fullest
               extent I can!
             </p>
-            <p>
+            <p className={paragraphClass}>
               My journey in technology began with a curiosity about how things work,
               which quickly evolved into a passion for creating and innovating. I've
               developed expertise in various programming languages and technologies,
               always striving to expand my knowledge and skills.
             </p>
-            <p>
+            <p className={paragraphClass}>
               When I'm not coding, I enjoy exploring modern fashion trends and finding
               creative ways to express myself. I believe that creativity and technical
               skill go hand in hand, and I bring both to every project I work on.
             </p>
-          </AboutText>
+          </div>
           
-          <SkillsContainer>
-            <SkillsTitle>My Skills</SkillsTitle>
-            <SkillsGrid>
+          <div className="bg-panel/70 rounded-[10px] p-8 border border-line relative min-h-[300px]">
+            <h3 className="text-[1.8rem] font-bold text-gold mb-6">My Skills</h3>
+            <div className="grid grid-cols-3 gap-[15px] max-md:grid-cols-2">
               {skills.map((skill, index) => (
-                <SkillBubble 
+                <div 
                   key={index}
+                  className={`bg-surface text-white border border-gold rounded-[10px] p-3 flex items-center justify-center text-center text-[0.9rem] transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] origin-center cursor-pointer h-[45px] relative overflow-hidden hover:scale-110 hover:bg-gold hover:text-space hover:z-10 hover:shadow-[0_5px_15px_rgba(212,175,55,0.3)] ${shineClass} before:via-gold/20 before:duration-500`}
                   style={{
                     borderColor: getCategoryColor(skill.category),
                     animationDelay: `${index * 0.05}s`,
@@ -552,132 +294,97 @@ const About = () => {
                   }}
                 >
                   {skill.name}
-                </SkillBubble>
+                </div>
               ))}
-            </SkillsGrid>
-          </SkillsContainer>
+            </div>
+          </div>
           
-          <EducationCard>
-            <EducationTitle>
+          <div
+            className={`bg-linear-135/srgb from-panel/90 to-surface/80 border-2 border-gold rounded-xl p-10 mt-8 relative overflow-hidden transition-all duration-300 ease-[ease] hover:-translate-y-[5px] hover:shadow-[0_10px_30px_rgba(212,175,55,0.25)] ${shineClass} before:via-gold/10 before:duration-600`}
+          >
+            <h3 className="text-[1.6rem] font-bold text-gold mb-[0.8rem] flex items-center gap-2.5">
               <span>🎓</span>
               Education
-            </EducationTitle>
-            <EducationSchool>Georgia State University</EducationSchool>
-            <EducationDegree>Bachelor of Science in Data Science</EducationDegree>
-            <EducationDate>Graduated: Fall 2025</EducationDate>
-          </EducationCard>
-        </AboutContent>
+            </h3>
+            <p className="text-[1.1rem] text-gold-bright my-2 font-semibold">Georgia State University</p>
+            <p className="text-base text-ink my-[0.3rem]">Bachelor of Science in Data Science</p>
+            <p className="text-[0.95rem] text-muted mt-4 italic">Graduated: Fall 2025</p>
+          </div>
+        </div>
         
-        <SectionDivider />
+        <div className="my-20 h-px bg-linear-to-r/srgb from-transparent via-line to-transparent" />
         
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <p style={{ fontSize: '1.2rem', color: '#c0c0c0', maxWidth: '800px', margin: '0 auto' }}>
+        <div className="text-center mb-8">
+          <p className="text-[1.2rem] text-silver max-w-[800px] mx-auto">
             I'm particularly drawn to urban streetwear and minimalist aesthetics, finding inspiration in the fusion of comfort and bold expression.
           </p>
         </div>
         
-        <ItemsGrid className="fashion-grid">
+        <div className="fashion-grid grid grid-cols-2 auto-rows-[minmax(250px,auto)] gap-6 my-12 md:grid-cols-4">
           {fashionImages.map((item, boxIndex) => (
-            <ItemBox 
+            <div 
               key={boxIndex} 
-              className="fashion-box"
+              className={`fashion-box ${itemBoxClass}`}
               ref={el => { if (el) fashionBoxesRef.current[boxIndex] = el; }}
-              height={item.height}
-              mobileHeight={item.mobileHeight}
-              minFloat={item.minFloat}
-              maxFloat={item.maxFloat}
-              animationDuration={item.animationDuration}
-              animationDelay={item.animationDelay}
               onClick={() => toggleImageView(boxIndex, 'fashion')}
-              style={{ cursor: 'pointer' }}
+              style={itemBoxStyle(item)}
             >
               <SlidingImages 
                 images={item.images} 
                 boxIndex={boxIndex} 
                 imageType="fashion" 
               />
-            </ItemBox>
+            </div>
           ))}
-        </ItemsGrid>
+        </div>
         
-        <SectionDivider />
+        <div className="my-20 h-px bg-linear-to-r/srgb from-transparent via-line to-transparent" />
         
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <p style={{ fontSize: '1.2rem', color: '#c0c0c0', maxWidth: '800px', margin: '0 auto' }}>
+        <div className="text-center mb-8">
+          <p className="text-[1.2rem] text-silver max-w-[800px] mx-auto">
             Beyond fashion, I enjoy discovering unique home decor pieces and functional appliances that blend artistry with practicality. These items represent the aesthetic style I'm drawn to.
           </p>
         </div>
         
-        <ItemsGrid className="decor-grid">
+        <div className="decor-grid grid grid-cols-2 auto-rows-[minmax(250px,auto)] gap-6 my-12 md:grid-cols-4">
           {decorImages.map((item, boxIndex) => (
-            <ItemBox 
+            <div 
               key={boxIndex} 
-              className="decor-box"
+              className={`decor-box ${itemBoxClass}`}
               ref={el => { if (el) decorBoxesRef.current[boxIndex] = el; }}
-              height={item.height}
-              mobileHeight={item.mobileHeight}
-              minFloat={item.minFloat}
-              maxFloat={item.maxFloat}
-              animationDuration={item.animationDuration}
-              animationDelay={item.animationDelay}
               onClick={() => toggleImageView(boxIndex, 'decor')}
-              style={{ cursor: 'pointer' }}
+              style={itemBoxStyle(item)}
             >
               <SlidingImages 
                 images={item.images} 
                 boxIndex={boxIndex} 
                 imageType="decor" 
               />
-            </ItemBox>
+            </div>
           ))}
-        </ItemsGrid>
-      </Container>
+        </div>
+      </div>
       
       {/* Overlay for enlarged images */}
-      <ImageOverlay 
-        className="overlay"
-        visible={activeImage !== null} 
+      <div 
+        className={`overlay fixed inset-0 bg-black/80 z-15 cursor-pointer ${activeImage !== null ? 'block' : 'hidden'}`}
         onClick={() => setActiveImage(null)}
       >
         {activeImage && (
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '80%',
-            maxWidth: '800px',
-            maxHeight: '80vh',
-            background: '#111',
-            borderRadius: '10px',
-            overflow: 'hidden',
-            boxShadow: '0 0 30px rgba(0,0,0,0.8)'
-          }}>
-            <div style={{
-              width: '100%',
-              height: '0',
-              paddingBottom: '75%',
-              position: 'relative'
-            }}>
+          <div className="absolute top-1/2 left-1/2 -translate-1/2 w-4/5 max-w-[800px] max-h-[80vh] bg-panel rounded-[10px] overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+            <div className="w-full h-0 pb-[75%] relative">
               <img 
                 src={`/images/${activeImage.type === 'fashion' 
                   ? fashionImages[activeImage.index].images[0] 
                   : decorImages[activeImage.index].images[0]}`} 
                 alt="Enlarged view"
-                style={{
-                  position: 'absolute',
-                  top: '0',
-                  left: '0',
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           </div>
         )}
-      </ImageOverlay>
-    </AboutSection>
+      </div>
+    </section>
   );
 };
 

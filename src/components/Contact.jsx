@@ -1,222 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useContactFormStore } from '../stores/contactFormStore';
-import styled from 'styled-components';
 
-const ContactSection = styled.section`
-  min-height: 100vh;
-  padding: 80px 20px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #0c0c0c;
-`;
+const fieldClass =
+  'rounded-[5px] border-none bg-[rgba(61,61,61,0.8)] p-4 text-[1rem] text-[#f0f0f0] transition-all duration-300 ease-[ease] placeholder:text-[#757575] focus:shadow-[0_0_0_2px_var(--color-gold)] focus:outline-none';
 
-const Container = styled.div`
-  max-width: 800px;
-  width: 100%;
-  background: rgba(27, 27, 27, 0.8);
-  border-radius: 15px;
-  padding: 3rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  position: relative;
-  z-index: 1;
-  backdrop-filter: blur(10px);
-  max-height: 80vh; /* Fixed height */
-  overflow-y: auto; /* Enable scrolling */
-  
-  @media (max-width: 768px) {
-    padding: 2rem;
-  }
-`;
+const secondaryButtonClass =
+  'cursor-pointer rounded-[5px] border border-ink bg-transparent px-6 py-4 text-[1rem] text-ink transition-all duration-300 ease-[ease] hover:bg-line';
 
-const SectionTitle = styled.h2`
-  font-size: 3rem;
-  color: #d4af37;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  
-  @media (max-width: 768px) {
-    font-size: 2.5rem;
-  }
-`;
+const compactSecondaryButtonClass =
+  'cursor-pointer rounded-[5px] border border-ink bg-transparent px-2 py-1 text-[0.8rem] text-ink transition-all duration-300 ease-[ease] hover:bg-line';
 
-const ContactInfo = styled.p`
-  font-size: 1.2rem;
-  text-align: center;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-  color: #d4d4d4;
-  
-  a {
-    color: #d4af37;
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-`;
+const formGroupClass = 'flex flex-col gap-2';
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Label = styled.label`
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #d4d4d4;
-`;
-
-const Input = styled.input`
-  padding: 1rem;
-  background: rgba(61, 61, 61, 0.8);
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  color: #f0f0f0;
-  transition: all 0.3s ease;
-  
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px #d4af37;
-  }
-`;
-
-const Textarea = styled.textarea`
-  padding: 1rem;
-  background: rgba(61, 61, 61, 0.8);
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  color: #f0f0f0;
-  resize: vertical;
-  min-height: 150px;
-  transition: all 0.3s ease;
-  
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px #d4af37;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-const SubmitButton = styled.button`
-  padding: 1rem 2rem;
-  background: #d4af37;
-  color: #000;
-  border: none;
-  border-radius: 5px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: #a98c37;
-    transform: translateY(-3px);
-  }
-  
-  &:active {
-    transform: translateY(1px);
-  }
-  
-  &:disabled {
-    background: #7d6b2e;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const SecondaryButton = styled.button`
-  padding: 1rem 1.5rem;
-  background: transparent;
-  color: #d4d4d4;
-  border: 1px solid #d4d4d4;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: #333;
-  }
-`;
-
-const SavedMessage = styled.div`
-  background: rgba(128, 128, 128, 0.2);
-  color: #d4d4d4;
-  padding: 0.5rem;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-  text-align: center;
-  font-size: 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const SuccessMessage = styled.div`
-  background: rgba(40, 167, 69, 0.9);
-  color: white;
-  padding: 1rem;
-  border-radius: 5px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: bold;
-  animation: fadeIn 0.5s ease;
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background: rgba(220, 53, 69, 0.9);
-  color: white;
-  padding: 1rem;
-  border-radius: 5px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: bold;
-`;
-
-const StorageInfo = styled.div`
-  background: rgba(13, 110, 253, 0.1);
-  border: 1px solid rgba(13, 110, 253, 0.2);
-  color: #a0c0ff;
-  padding: 0.75rem;
-  border-radius: 5px;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
-  
-  strong {
-    color: #d4af37;
-  }
-`;
+const labelClass = 'text-[1.1rem] font-bold text-ink';
 
 const Contact = () => {
   const { 
@@ -272,50 +68,53 @@ const Contact = () => {
   };
   
   return (
-    <ContactSection id="contact">
-      <Container>
-        <SectionTitle>Contact Me</SectionTitle>
+    <section
+      id="contact"
+      className="relative flex min-h-screen flex-col items-center justify-center bg-surface-deep px-5 py-20"
+    >
+      <div className="relative z-[1] max-h-[80vh] w-full max-w-[800px] overflow-y-auto rounded-[15px] bg-surface/80 p-12 shadow-[0_10px_30px_rgba(0,0,0,0.3)] backdrop-blur-[10px] max-md:p-8">
+        <h2 className="mb-6 text-center text-[3rem] font-bold text-gold max-md:text-[2.5rem]">Contact Me</h2>
         
-        <ContactInfo>
+        <p className="mb-8 text-center text-[1.2rem] leading-[1.6] text-ink max-md:text-[1rem]">
           I'd love to hear from you! Fill out the form below or email me directly at{' '}
-          <a href="mailto:anivar.fw@gmail.com">anivar.fw@gmail.com</a>.
-        </ContactInfo>
+          <a href="mailto:anivar.fw@gmail.com" className="text-gold no-underline hover:underline">anivar.fw@gmail.com</a>.
+        </p>
         
         {formData.name && isDirty && (
-          <StorageInfo>
-            <strong>Your form data is being saved locally.</strong> If you leave this page and come back later, your draft will still be here.
-          </StorageInfo>
+          <div className="mb-6 rounded-[5px] border border-[rgba(13,110,253,0.2)] bg-[rgba(13,110,253,0.1)] p-3 text-[0.9rem] text-[#a0c0ff]">
+            <strong className="text-gold">Your form data is being saved locally.</strong> If you leave this page and come back later, your draft will still be here.
+          </div>
         )}
         
         {formattedLastSaved && (
-          <SavedMessage>
+          <div className="mb-4 flex items-center justify-between rounded-[5px] bg-[rgba(128,128,128,0.2)] p-2 text-center text-[0.9rem] text-ink">
             <span>Last saved: {formattedLastSaved}</span>
-            <SecondaryButton 
+            <button 
               type="button" 
               onClick={resetForm}
-              style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }}
+              className={compactSecondaryButtonClass}
             >
               Clear Saved Data
-            </SecondaryButton>
-          </SavedMessage>
+            </button>
+          </div>
         )}
         
         {submitSuccess && (
-          <SuccessMessage>
+          <div className="mb-6 translate-y-0 rounded-[5px] bg-[rgba(40,167,69,0.9)] p-4 text-center font-bold text-white opacity-100 transition-all duration-500 ease-[ease] starting:-translate-y-2.5 starting:opacity-0">
             Thanks for reaching out! I'll get back to you soon.
-          </SuccessMessage>
+          </div>
         )}
         
         {submitError && (
-          <ErrorMessage>
+          <div className="mb-6 rounded-[5px] bg-[rgba(220,53,69,0.9)] p-4 text-center font-bold text-white">
             {submitError}
-          </ErrorMessage>
+          </div>
         )}
         
-        <Form onSubmit={handleSubmit}>
-          <FormGroup>
-            <Label htmlFor="name">Name</Label>
-            <Input
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className={formGroupClass}>
+            <label htmlFor="name" className={labelClass}>Name</label>
+            <input
               type="text"
               id="name"
               name="name"
@@ -323,12 +122,13 @@ const Contact = () => {
               onChange={handleChange}
               placeholder="Your Name"
               required
+              className={fieldClass}
             />
-          </FormGroup>
+          </div>
           
-          <FormGroup>
-            <Label htmlFor="email">Email</Label>
-            <Input
+          <div className={formGroupClass}>
+            <label htmlFor="email" className={labelClass}>Email</label>
+            <input
               type="email"
               id="email"
               name="email"
@@ -336,41 +136,47 @@ const Contact = () => {
               onChange={handleChange}
               placeholder="Your Email"
               required
+              className={fieldClass}
             />
-          </FormGroup>
+          </div>
           
-          <FormGroup>
-            <Label htmlFor="message">Message</Label>
-            <Textarea
+          <div className={formGroupClass}>
+            <label htmlFor="message" className={labelClass}>Message</label>
+            <textarea
               id="message"
               name="message"
               value={formData.message}
               onChange={handleChange}
               placeholder="What's on your mind?"
               required
+              className={`${fieldClass} min-h-[150px] resize-y`}
             />
-          </FormGroup>
+          </div>
           
-          <ButtonGroup>
-            <SubmitButton type="submit" disabled={isSubmitting}>
+          <div className="flex flex-wrap gap-4 max-md:flex-col">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="cursor-pointer rounded-[5px] border-none bg-gold px-8 py-4 text-[1.1rem] font-bold text-space transition-all duration-300 ease-[ease] hover:-translate-y-[3px] hover:bg-gold-deep active:translate-y-px disabled:translate-none disabled:cursor-not-allowed disabled:bg-[#7d6b2e]"
+            >
               {isSubmitting ? 'Sending...' : 'Send Message'}
-            </SubmitButton>
+            </button>
             
             {isDirty && (
-              <SecondaryButton type="button" onClick={saveForm}>
+              <button type="button" onClick={saveForm} className={secondaryButtonClass}>
                 Save Draft
-              </SecondaryButton>
+              </button>
             )}
             
             {isDirty && (
-              <SecondaryButton type="button" onClick={resetForm}>
+              <button type="button" onClick={resetForm} className={secondaryButtonClass}>
                 Clear Form
-              </SecondaryButton>
+              </button>
             )}
-          </ButtonGroup>
-        </Form>
-      </Container>
-    </ContactSection>
+          </div>
+        </form>
+      </div>
+    </section>
   );
 };
 

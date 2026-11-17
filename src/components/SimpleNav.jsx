@@ -1,94 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
 
-const NavContainer = styled.nav`
-  position: fixed;
-  top: 30px;
-  right: 30px;
-  z-index: 100;
-`;
+const dropdownItemClass = 'block px-[15px] py-3 text-white transition-all duration-200 ease-[ease]';
+const hoverClasses = {
+  gold: 'hover:bg-gold/20 hover:text-gold',
+  emerald: 'hover:bg-emerald/20 hover:text-emerald',
+  coral: 'hover:bg-coral/20 hover:text-coral',
+  github: 'hover:bg-github/20 hover:text-github',
+  linkedin: 'hover:bg-linkedin/20 hover:text-linkedin',
+};
 
-const HamburgerButton = styled.button`
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0;
-  transition: all 0.3s ease;
-  
-  span {
-    width: 25px;
-    height: 3px;
-    background: #d4af37;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-    display: block;
-  }
-  
-  ${props => props.isOpen && `
-    span:nth-child(1) {
-      transform: rotate(45deg) translate(6px, 6px);
-    }
-    span:nth-child(2) {
-      opacity: 0;
-    }
-    span:nth-child(3) {
-      transform: rotate(-45deg) translate(6px, -6px);
-    }
-  `}
-  
-  &:hover span {
-    background: #ffd700;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
-  }
-`;
-
-const DropdownContent = styled.div`
-  position: absolute;
-  top: 45px;
-  right: 0;
-  background: rgba(27, 27, 27, 0.95);
-  border-radius: 5px;
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  backdrop-filter: blur(10px);
-  width: 150px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  opacity: ${props => (props.isOpen ? '1' : '0')};
-  transform: translateY(${props => (props.isOpen ? '0' : '-10px')});
-  pointer-events: ${props => (props.isOpen ? 'auto' : 'none')};
-  transition: all 0.3s ease;
-  z-index: 25;
-`;
-
-const DropdownItem = styled(Link)`
-  display: block;
-  padding: 12px 15px;
-  color: #fff;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: ${props => props.hovercolor ? `${props.hovercolor}33` : 'rgba(212, 175, 55, 0.3)'};
-    color: ${props => props.hovercolor || '#d4af37'};
-  }
-`;
-
-const ExternalDropdownItem = styled.a`
-  display: block;
-  padding: 12px 15px;
-  color: #fff;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: ${props => props.hovercolor ? `${props.hovercolor}33` : 'rgba(212, 175, 55, 0.3)'};
-    color: ${props => props.hovercolor || '#d4af37'};
-  }
-`;
+const barClass =
+  'block w-[25px] h-[3px] bg-gold rounded-[2px] transition-all duration-300 ease-[ease] group-hover:bg-gold-bright group-hover:shadow-[0_0_8px_rgba(212,175,55,0.4)]';
 
 const SimpleNav = () => {
   const location = useLocation();
@@ -96,41 +19,45 @@ const SimpleNav = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   
   return (
-    <NavContainer>
-      <HamburgerButton 
-        isOpen={dropdownOpen}
+    <nav className="fixed top-[30px] right-[30px] z-100">
+      <button
+        className="group bg-transparent border-none cursor-pointer flex flex-col gap-[5px] p-0 transition-all duration-300 ease-[ease]"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
-        <span></span>
-        <span></span>
-        <span></span>
-      </HamburgerButton>
+        <span className={`${barClass} ${dropdownOpen ? 'transform-[rotate(45deg)_translate(6px,6px)]' : ''}`}></span>
+        <span className={`${barClass} ${dropdownOpen ? 'opacity-0' : ''}`}></span>
+        <span className={`${barClass} ${dropdownOpen ? 'transform-[rotate(-45deg)_translate(6px,-6px)]' : ''}`}></span>
+      </button>
       
-      <DropdownContent isOpen={dropdownOpen}>
-        <DropdownItem to="/" hovercolor="#d4af37">Home</DropdownItem>
-        <DropdownItem to="/about" hovercolor="#d4af37">About</DropdownItem>
-        <DropdownItem to="/projects" hovercolor="#d4af37">Projects</DropdownItem>
-        <DropdownItem to="/goals" hovercolor="#00e676">Goals</DropdownItem>
-        <DropdownItem to="/resume" hovercolor="#00e676">Resume</DropdownItem>
-        <DropdownItem to="/contact" hovercolor="#ff6b6b">Contact</DropdownItem>
-        <ExternalDropdownItem 
+      <div
+        className={`absolute top-[45px] right-0 bg-surface/95 rounded-[5px] border border-gold/50 backdrop-blur-[10px] w-[150px] shadow-[0_5px_15px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-300 ease-[ease] z-25 ${
+          dropdownOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2.5 pointer-events-none'
+        }`}
+      >
+        <Link to="/" className={`${dropdownItemClass} ${hoverClasses.gold}`}>Home</Link>
+        <Link to="/about" className={`${dropdownItemClass} ${hoverClasses.gold}`}>About</Link>
+        <Link to="/projects" className={`${dropdownItemClass} ${hoverClasses.gold}`}>Projects</Link>
+        <Link to="/goals" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Goals</Link>
+        <Link to="/resume" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Resume</Link>
+        <Link to="/contact" className={`${dropdownItemClass} ${hoverClasses.coral}`}>Contact</Link>
+        <a 
           href="https://github.com/Lactoseandtolerance" 
           target="_blank" 
           rel="noopener noreferrer" 
-          hovercolor="#2464eb"
+          className={`${dropdownItemClass} ${hoverClasses.github}`}
         >
           GitHub
-        </ExternalDropdownItem>
-        <ExternalDropdownItem 
+        </a>
+        <a 
           href="https://www.linkedin.com/in/angel-nivar-a00740275/" 
           target="_blank" 
           rel="noopener noreferrer" 
-          hovercolor="#0077b5"
+          className={`${dropdownItemClass} ${hoverClasses.linkedin}`}
         >
           LinkedIn
-        </ExternalDropdownItem>
-      </DropdownContent>
-    </NavContainer>
+        </a>
+      </div>
+    </nav>
   );
 };
 
