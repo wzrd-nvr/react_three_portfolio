@@ -71,8 +71,10 @@ reviews:
     - path: ".github/workflows/**"
       instructions: >-
         Flag secrets echoed to logs, secrets available to pull_request runs from forks,
-        unpinned third-party actions beyond major tags, and npm ci steps whose Node
-        version differs from the one used to generate package-lock.json.
+        unpinned third-party actions beyond major tags, and npm ci steps that would
+        run an npm other than 10.9.x, the version package-lock.json is generated with
+        (for example, a Node upgrade that brings npm 11). Node compatibility is a
+        separate concern: Firebase packages declare node >=24.12 while CI runs Node 22.
     - path: "src/**/*.{js,jsx}"
       instructions: >-
         CRA with React 19, react-router-dom 7, styled-components and zustand. Firebase
