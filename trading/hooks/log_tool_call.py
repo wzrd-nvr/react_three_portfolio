@@ -97,6 +97,8 @@ def mask(value: Any, secret: str | None) -> Any:
         return {mask(key, secret): mask(item, secret) for key, item in value.items()}
     if isinstance(value, list):
         return [mask(item, secret) for item in value]
+    if isinstance(value, int) and not isinstance(value, bool):
+        return REDACTED if mask_text(str(value), secret) != str(value) else value
     return mask_text(value, secret) if isinstance(value, str) else value
 
 

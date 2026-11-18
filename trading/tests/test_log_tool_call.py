@@ -142,6 +142,33 @@ def test_the_input_account_is_removed_even_in_an_unusual_format(account):
     assert entry["tool_response"]["note"] == "acct [REDACTED]"
 
 
+@pytest.mark.parametrize(
+    ("tool_input", "number"),
+    [
+        ({}, int(OTHER_ACCOUNT)),
+        ({"account_number": ACCOUNT}, int(ACCOUNT)),
+        ({"account_number": ACCOUNT}, int(OTHER_ACCOUNT)),
+        ({"account_number": 12345678}, 12345678),
+    ],
+)
+def test_account_like_integers_are_removed_from_responses(tool_input, number):
+    response = json.dumps({"ref": number, "items": [number]})
+    entry = logged(run(event("get_portfolio", tool_input=tool_input, tool_response=response)))
+    assert entry["tool_response"] == {"ref": "[REDACTED]", "items": ["[REDACTED]"]}
+
+
+def test_account_like_integers_are_removed_from_the_input():
+    tool_input = {"ref": int(OTHER_ACCOUNT)}
+    entry = logged(run(event("get_portfolio", tool_input=tool_input, tool_response="{}")))
+    assert entry["tool_input"] == {"ref": "[REDACTED]"}
+
+
+@pytest.mark.parametrize("value", [0, 118, 12345678, 1795019133861, True, False, 351.88])
+def test_other_numbers_are_kept(value):
+    entry = logged(run(event(tool_response=json.dumps({"data": {"value": value}}))))
+    assert entry["tool_response"]["data"]["value"] == value
+
+
 def test_account_like_numbers_are_removed_from_errors_without_account_input():
     entry = logged(run(event("get_portfolio", "PostToolUseFailure", tool_input={}, error=f"account {ACCOUNT}: 401")))
     assert entry["tool_response"] == "account [REDACTED]: 401"
