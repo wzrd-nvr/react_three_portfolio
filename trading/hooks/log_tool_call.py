@@ -11,17 +11,15 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from lib import fields, session_state, store
-from lib.redact import redact
+from lib.redact import REDACTED, redact, redact_text
 
 ERROR_LOG = "hook_errors.log"
 FIRESTORE_TIMEOUT_SECONDS = 10
 MAX_TOOL_INPUT_BYTES = 50_000
 MAX_TOOL_RESPONSE_BYTES = 800_000
-REDACTED = "[REDACTED]"
-# Robinhood account numbers are 9 or 12 digits. The lookbehind spares fractional
-# seconds and decimals; DECIMAL_VALUE spares prices and volumes such as "3400000000.00".
-ACCOUNT_LIKE = re.compile(r"(?<!\d)(?<!\d\.)\d{9,12}(?!\d)")
-DECIMAL_VALUE = re.compile(r"-?\d+\.\d+")
+# Robinhood account numbers are 9 or 12 digits. The lookarounds spare both sides of
+# a decimal, such as a volume of 3400000000.00 or fractional seconds in a timestamp.
+ACCOUNT_LIKE = re.compile(r"(?<!\d)(?<!\d\.)\d{9,12}(?!\d)(?!\.\d)")
 
 
 def record_error(step: str) -> None:
@@ -87,9 +85,10 @@ def update_session_state(event: dict, now: datetime) -> None:
 
 
 def mask_text(text: str, secret: str | None) -> str:
+    text = redact_text(text)
     if secret:
         text = text.replace(secret, REDACTED)
-    return text if DECIMAL_VALUE.fullmatch(text) else ACCOUNT_LIKE.sub(REDACTED, text)
+    return ACCOUNT_LIKE.sub(REDACTED, text)
 
 
 def mask(value: Any, secret: str | None) -> Any:

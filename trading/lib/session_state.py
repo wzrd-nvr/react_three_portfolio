@@ -18,9 +18,12 @@ def _path(session_id: str, suffix: str) -> Path:
 
 def load(session_id: str) -> dict:
     try:
-        return json.loads(_path(session_id, ".json").read_text())
+        state = json.loads(_path(session_id, ".json").read_text())
     except FileNotFoundError:
         return {}
+    if not isinstance(state, dict):
+        raise ValueError("session state is not a JSON object")
+    return state
 
 
 def save(session_id: str, state: dict) -> None:

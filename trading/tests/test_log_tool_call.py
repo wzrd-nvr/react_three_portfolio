@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -186,6 +187,70 @@ def test_account_like_numbers_are_removed_from_deny_reasons():
 def test_market_data_is_not_mistaken_for_an_account_number(value):
     entry = logged(run(event(tool_response=json.dumps({"data": {"value": value}}))))
     assert entry["tool_response"]["data"]["value"] == value
+
+
+SECRET_TEXTS = [
+    "token=s3cr3t-value",
+    "access_token: s3cr3t-value",
+    "SSN=s3cr3t-value",
+    "Authorization: Bearer s3cr3t-value",
+    "GET /x?a=1&refresh_token=s3cr3t-value&b=2",
+    '{"client_secret":"s3cr3t-value',
+    '{"client_secret": "s3cr3t-value and more", "symbol"',
+    "{'access_token': 's3cr3t-value'}",
+    '{\\"access_token\\":\\"s3cr3t-value and more\\"}',
+    '{\\"access_token\\":\\"s3cr3t one s3cr3t two s3cr3t three\\"}',
+    '{"client_secret":"s3cr3t one s3cr3t two s3cr3t three',
+    "{'access_token': 's3cr3t one s3cr3t two s3cr3t three'}",
+]
+
+
+@pytest.mark.parametrize("text", SECRET_TEXTS)
+def test_sensitive_pairs_are_removed_from_non_json_responses(text):
+    assert "s3cr3t" not in json.dumps(logged(run(event(tool_response=text))), default=str)
+
+
+@pytest.mark.parametrize("text", SECRET_TEXTS)
+def test_sensitive_pairs_are_removed_from_error_text(text):
+    entry = logged(run(event(name="PostToolUseFailure", error=f"request failed: {text}")))
+    assert "s3cr3t" not in entry["tool_response"]
+    assert entry["tool_response"].startswith("request failed: ")
+
+
+@pytest.mark.parametrize("text", SECRET_TEXTS)
+def test_sensitive_pairs_are_removed_from_strings_inside_json(text):
+    entry = logged(run(event(tool_response=json.dumps({"data": {"note": text}}))))
+    assert "s3cr3t" not in entry["tool_response"]["data"]["note"]
+
+
+def test_sensitive_pairs_are_removed_from_deny_reasons():
+    entry = logged(run(event(name="PermissionDenied", reason="blocked token=s3cr3t-value")))
+    assert entry["deny_reason"] == "blocked token=[REDACTED]"
+
+
+def test_text_after_a_sensitive_pair_is_kept():
+    entry = logged(run(event(tool_response="token=s3cr3t-value, symbol=AAPL")))
+    assert entry["tool_response"] == "token=[REDACTED], symbol=AAPL"
+
+
+def test_error_text_without_sensitive_pairs_is_unchanged():
+    error = 'market value fetch: API error 401: {"code":16,"message":"","details":[]}'
+    assert logged(run(event(name="PostToolUseFailure", error=error)))["tool_response"] == error
+
+
+@pytest.mark.parametrize("text", ["a" * 400_000, "token" * 80_000])
+def test_scrubbing_long_unbroken_text_stays_fast(text):
+    started = time.monotonic()
+    run(event(tool_response=text))
+    assert time.monotonic() - started < 2
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["volume 3400000000.00", "market cap: 123456789012.50, up", "-3400000000.25 change"],
+)
+def test_decimals_inside_free_text_are_kept(text):
+    assert logged(run(event(tool_response=text)))["tool_response"] == text
 
 
 def test_permission_denied_records_the_reason():

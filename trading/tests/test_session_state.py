@@ -37,6 +37,22 @@ def test_corrupt_state_raises_instead_of_reading_as_empty(state_dir):
         session_state.load("abc")
 
 
+@pytest.mark.parametrize("content", ["[]", '"text"', "7", "null", "true"])
+def test_state_that_is_not_an_object_raises(state_dir, content):
+    state_dir.mkdir()
+    (state_dir / "abc.json").write_text(content)
+    with pytest.raises(ValueError):
+        session_state.load("abc")
+
+
+def test_update_leaves_state_that_is_not_an_object_untouched(state_dir):
+    state_dir.mkdir()
+    (state_dir / "abc.json").write_text("[]")
+    with pytest.raises(ValueError):
+        session_state.update("abc", lambda state: state.setdefault("quotes", {}))
+    assert (state_dir / "abc.json").read_text() == "[]"
+
+
 @pytest.mark.parametrize("session_id", ["../../etc/passwd", "a/b", "", "a b"])
 def test_rejects_unsafe_session_ids(session_id):
     with pytest.raises(ValueError):
