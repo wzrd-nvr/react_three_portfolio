@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 
@@ -12,6 +12,8 @@ import Resume from './components/Resume';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import StarBackground from './components/StarBackground'; 
+
+const Trading = lazy(() => import('./components/Trading'));
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -88,6 +90,7 @@ function App() {
         <Route path="/goals" element={<SimpleNav />} />
         <Route path="/resume" element={<SimpleNav />} />
         <Route path="/contact" element={<SimpleNav />} />
+        <Route path="/trading" element={<SimpleNav />} />
       </Routes>
       
       <ContentWrapper>
@@ -98,6 +101,14 @@ function App() {
           <Route path="/goals" element={<Goals />} />
           <Route path="/resume" element={<Resume />} />
           <Route path="/contact" element={<Contact />} />
+          <Route
+            path="/trading"
+            element={
+              <Suspense fallback={null}>
+                <Trading />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         
