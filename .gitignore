@@ -26,3 +26,13 @@ yarn-error.log*
 .firebase/
 firebase-debug.log
 *-debug.log
+
+# Local planning docs (trading agent spec, plan, phases)
+/docs/
+
+# Trading agent
+trading/fixtures/raw/
+trading/.env
+trading/.state/
+__pycache__/
+.venv/

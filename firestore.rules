@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    match /public_snapshot/{id} {
+      allow get: if true;
+      allow list, write: if false;
+    }
+    match /public_trades/{id} {
+      allow get: if true;
+      allow list: if request.query.limit <= 100;
+      allow write: if false;
+    }
+    match /public_equity_history/{id} {
+      allow get: if true;
+      allow list: if request.query.limit <= 400;
+      allow write: if false;
+    }
+    match /public_runs/{id} {
+      allow get: if true;
+      allow list: if request.query.limit <= 50;
+      allow write: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+tone_instructions: "Be direct and concise. Lead with correctness and security issues; skip praise and style nitpicks a linter would catch."
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  in_progress_fortune: false
+  sequence_diagrams: false
+  suggested_reviewers: false
+  collapse_walkthrough: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+
+  security_risk_instructions: >-
+    This is a public repository; anything committed is world-readable. The site is a
+    static React app on Firebase Hosting. Browsers read Firestore directly, so
+    firestore.rules is the only access control for client traffic: only the public_*
+    collections may be readable, list queries must be capped by a limit, and no client
+    write is allowed. The trading/ directory is an unattended agent that places real
+    orders in a Robinhood brokerage account through an MCP server; its guard hook is
+    the enforcement point for order limits and must fail closed. Robinhood account
+    numbers, OAuth tokens and service-account keys must never be committed or written
+    to public_* collections. Workflow secrets must never reach fork PRs or logs.
+
+  merge_risk_instructions: >-
+    Higher risk: firestore.rules, trading/hooks/, trading/lib/limits.py,
+    trading/lib/order_counter.py, trading/lib/projectors.py, trading/.claude/settings.json,
+    .github/workflows/, and package-lock.json changes made with an npm other than 10.9.x
+    (CI runs npm 10.9.x and fails on lockfiles missing nested entries). Lower risk:
+    styling-only changes in src/components/ and test-only changes.
+
+  path_filters:
+    - "!package-lock.json"
+    - "!build/**"
+    - "!public/**/*.{mp4,webm,jpg,jpeg,png,webp,gif,ico,pdf,glb,gltf}"
+    - "!trading/fixtures/raw/**"
+
+  path_instructions:
+    - path: "firestore.rules"
+      instructions: >-
+        Flag any rule that allows client writes, reads outside public_* collections,
+        list queries without a limit cap, or a wildcard match that loosens the final
+        deny-all. Every rule change needs a matching case in firestore-tests/.
+    - path: "firestore-tests/**"
+      instructions: >-
+        Tests must run against a demo- project ID so they never touch production.
+        Flag removed or loosened assertions.
+    - path: "trading/hooks/**"
+      instructions: >-
+        guard.py is a PreToolUse hook that must fail closed: any exception, missing
+        field, failed Firestore read or ambiguous input must deny (exit 2). Flag any
+        path that allows by default. log_tool_call.py must never block (always exit 0)
+        and must redact before writing.
+    - path: "trading/lib/**"
+      instructions: >-
+        Robinhood field names must be read only through lib/fields.py. Public documents
+        must be built from an explicit field allowlist, never by copying or redacting a
+        raw response, and only for the Agentic account. Flag anything that could leak
+        account numbers, tokens or balances of other accounts.
+    - path: "trading/tests/**"
+      instructions: >-
+        Unit tests must not make network calls; Firestore is injected or emulated.
+        Flag deleted assertions, loosened matchers or skipped tests.
+    - path: ".github/workflows/**"
+      instructions: >-
+        Flag secrets echoed to logs, secrets available to pull_request runs from forks,
+        unpinned third-party actions beyond major tags, and npm ci steps that would
+        run an npm other than 10.9.x, the version package-lock.json is generated with
+        (for example, a Node upgrade that brings npm 11). Node compatibility is a
+        separate concern: Firebase packages declare node >=24.12 while CI runs Node 22.
+    - path: "src/**/*.{js,jsx}"
+      instructions: >-
+        CRA with React 19, react-router-dom 7, styled-components and zustand. Firebase
+        must stay out of the main bundle (load it via React.lazy routes). Flag Firestore
+        queries without limit() on public_* list reads, since rules deny them.
+
+  tools:
+    ruff:
+      enabled: true
+    shellcheck:
+      enabled: true
+    actionlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    eslint:
+      enabled: true
+    yamllint:
+      enabled: true
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  web_search:
+    enabled: true
+  learnings:
+    scope: local
