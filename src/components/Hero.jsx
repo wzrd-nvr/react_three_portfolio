@@ -1,99 +1,25 @@
 import React from 'react';
-import styled from 'styled-components';
 
-const HeroContainer = styled.section`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  padding-top: 60px;
-`;
-
-const HeroContent = styled.div`
-  z-index: 2;
-  position: relative;
-  max-width: 800px;
-  padding: 30px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 10px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-`;
-
-const Title = styled.h1`
-  font-size: 4.5rem;
-  color: #d4af37;
-  margin-bottom: 1rem;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  
-  @media (max-width: 768px) {
-    font-size: 3rem;
-  }
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.8rem;
-  color: #c0c0c0;
-  margin-bottom: 2rem;
-  max-width: 800px;
-  
-  @media (max-width: 768px) {
-    font-size: 1.4rem;
-  }
-`;
-
-const ScrollIndicator = styled.div`
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
-  font-size: 1rem;
-  
-  &::after {
-    content: '';
-    display: block;
-    width: 20px;
-    height: 20px;
-    border-right: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    transform: rotate(45deg);
-    margin: 10px auto;
-    animation: scrollDown 2s infinite;
-  }
-  
-  @keyframes scrollDown {
-    0% {
-      opacity: 0;
-      transform: rotate(45deg) translate(-5px, -5px);
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: rotate(45deg) translate(5px, 5px);
-    }
-  }
-`;
+const subtitleClass = 'text-[1.8rem] max-md:text-[1.4rem] text-silver mb-8 max-w-[800px]';
 
 const Hero = () => {
   return (
-    <HeroContainer id="hero">
-      <HeroContent>
-        <Title>Angel Nivar</Title>
-        <Subtitle>Exploring the infinite possibilities of technology.</Subtitle>
-        <Subtitle>Welcome to my portfolio</Subtitle>
-      </HeroContent>
+    <section
+      id="hero"
+      className="h-screen flex flex-col justify-center items-center text-center relative overflow-hidden pt-[60px]"
+    >
+      <div className="z-2 relative max-w-[800px] p-[30px] bg-black/60 rounded-[10px] backdrop-blur-[8px] shadow-[0_10px_25px_rgba(0,0,0,0.5)] border border-gold/30">
+        <h1 className="text-[4.5rem] max-md:text-[3rem] text-gold mb-4 font-bold text-shadow-[0_0_10px_rgba(0,0,0,0.5)]">
+          Angel Nivar
+        </h1>
+        <p className={subtitleClass}>Exploring the infinite possibilities of technology.</p>
+        <p className={subtitleClass}>Welcome to my portfolio</p>
+      </div>
       
-      <ScrollIndicator>Scroll to learn more</ScrollIndicator>
-    </HeroContainer>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white text-[1rem] after:content-[''] after:block after:size-5 after:border-r-2 after:border-b-2 after:border-white after:transform-[rotate(45deg)] after:mx-auto after:my-2.5 after:animate-scroll-down">
+        Scroll to learn more
+      </div>
+    </section>
   );
 };
 

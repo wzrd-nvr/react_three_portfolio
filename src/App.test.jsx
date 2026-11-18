@@ -1,9 +1,10 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 import useTradingFeed from './hooks/useTradingFeed';
 
-jest.mock('./components/Navigation', () => () => <nav>globe navigation</nav>);
-jest.mock('./hooks/useTradingFeed');
+vi.mock('./components/Navigation', () => ({ default: () => <nav>globe navigation</nav> }));
+vi.mock('./hooks/useTradingFeed');
 
 beforeEach(() => {
   useTradingFeed.mockReturnValue({ snapshot: null, trades: [], history: [], runs: [], loading: false, error: null });

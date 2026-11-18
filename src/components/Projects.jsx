@@ -1,278 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useRef } from 'react';
 
-const ProjectsSection = styled.section`
-  min-height: 100vh;
-  padding: 80px 20px;
-  position: relative;
-  background-color: rgba(10, 10, 10, 0.3); // Changed from solid to semi-transparent
-`;
+const techTagClass =
+  'mr-2 mb-2 inline-block rounded-[15px] border border-gold/20 bg-gold/10 px-2.5 py-1 text-ink';
 
+const projectLinkClass =
+  'mr-4 inline-block cursor-pointer rounded-[5px] border border-gold bg-transparent px-3 py-2 font-bold text-gold no-underline transition-all duration-300 ease-[ease] hover:bg-gold hover:text-space focus-visible:bg-gold focus-visible:text-space';
 
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-`;
+const projectLinksClass = 'mt-auto border-t border-white/10 pt-4';
 
-const SectionTitle = styled.h2`
-  font-size: 3rem;
-  color: #d4af37;
-  margin-bottom: 3rem;
-  text-align: center;
-  
-  @media (max-width: 768px) {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-  }
-`;
-
-const ProjectsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 30px;
-  margin-bottom: 40px;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ProjectCard = styled.div`
-  background: #1b1b1b;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgba(212, 175, 55, 0.1);
-  
-  &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(212, 175, 55, 0.2);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-  }
-`;
-
-const ProjectMedia = styled.div`
-  width: 100%;
-  height: 220px;
-  overflow: hidden;
-  position: relative;
-  
-  video, img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-  
-  &:hover {
-    video, img {
-      transform: scale(1.05);
-    }
-  }
-`;
-
-const MediaOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.8) 100%);
-`;
-
-const ProjectInfo = styled.div`
-  padding: 1.5rem;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-`;
-
-const ProjectTitle = styled.h3`
-  font-size: 1.6rem;
-  color: #d4af37;
-  margin-bottom: 1rem;
-  position: relative;
-  
-  &:after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 40px;
-    height: 3px;
-    background: #d4af37;
-  }
-`;
-
-const ProjectDescription = styled.p`
-  margin-bottom: 1rem;
-  line-height: 1.6;
-  color: #d4d4d4;
-  flex-grow: 1;
-  
-  /* Limit to 4 lines with ellipsis */
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const TechUsed = styled.div`
-  margin: 1rem 0;
-  color: #a0a0a0;
-  font-size: 0.9rem;
-  
-  span {
-    display: inline-block;
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 15px;
-    padding: 4px 10px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    color: #d4d4d4;
-  }
-`;
-
-const ProjectLinks = styled.div`
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  
-  a,
-  button {
-    display: inline-block;
-    margin-right: 1rem;
-    font-family: inherit;
-    font-size: inherit;
-    background: none;
-    cursor: pointer;
-    color: #d4af37;
-    font-weight: bold;
-    text-decoration: none;
-    padding: 8px 12px;
-    border: 1px solid #d4af37;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    
-    &:hover,
-    &:focus-visible {
-      background: #d4af37;
-      color: #000;
-    }
-  }
-`;
-
-const DetailModal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  opacity: ${props => props.show ? '1' : '0'};
-  visibility: ${props => props.show ? 'visible' : 'hidden'};
-  transition: all 0.3s ease;
-`;
-
-const ModalContent = styled.div`
-  background: #1b1b1b;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 900px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  display: flex;
-  flex-direction: column;
-  
-  @media (max-width: 768px) {
-    max-height: 80vh;
-  }
-`;
-
-const ModalHeader = styled.div`
-  padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  h3 {
-    font-size: 2rem;
-    color: #d4af37;
-    margin: 0;
-  }
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #d4d4d4;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    color: #d4af37;
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: 20px;
-  
-  .modal-media {
-    width: 100%;
-    height: 400px;
-    margin-bottom: 20px;
-    
-    video, img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-    
-    @media (max-width: 768px) {
-      height: 250px;
-    }
-  }
-  
-  p {
-    line-height: 1.8;
-    margin-bottom: 20px;
-    color: #d4d4d4;
-  }
-`;
-
-const ModalFooter = styled.div`
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 15px;
-  }
-`;
+const techUsedClass = 'my-4 text-[0.9rem] text-muted';
 
 const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (showModal && !dialog.open) dialog.showModal();
+    else if (!showModal && dialog.open) dialog.close();
+  }, [showModal]);
   
   // Lock/unlock body scroll when modal opens/closes
   useEffect(() => {
@@ -353,16 +100,23 @@ const Projects = () => {
   };
   
   return (
-    <ProjectsSection id="projects">
-      <Container>
-        <SectionTitle>My Projects</SectionTitle>
+    <section id="projects" className="relative min-h-screen bg-[rgba(10,10,10,0.3)] px-5 py-20">
+      <div className="relative z-[1] mx-auto max-w-[1200px]">
+        <h2 className="mb-12 text-center text-[3rem] font-bold text-gold max-md:mb-8 max-md:text-[2.5rem]">
+          My Projects
+        </h2>
         
-        <ProjectsGrid>
+        <div className="mb-10 grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-[30px] max-md:grid-cols-1">
           {reversedProjects.map((project, index) => (
-            <ProjectCard key={index} onClick={() => openProjectDetails(project)}>
-              <ProjectMedia>
+            <div
+              key={index}
+              onClick={() => openProjectDetails(project)}
+              className="flex h-full flex-col overflow-hidden rounded-[10px] border border-gold/10 bg-surface shadow-[0_10px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[ease] hover:-translate-y-2.5 hover:border-gold/30 hover:shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
+            >
+              <div className="group relative h-[220px] w-full overflow-hidden">
                 {project.media.type === 'video' ? (
                   <video
+                    className="h-full w-full object-cover transition-transform duration-500 ease-[ease] group-hover:scale-105"
                     src={project.media.src}
                     poster={project.media.poster}
                     muted
@@ -376,25 +130,32 @@ const Projects = () => {
                     }}
                   />
                 ) : (
-                  <img src={project.media.src} alt={project.title} />
+                  <img
+                    className="h-full w-full object-cover transition-transform duration-500 ease-[ease] group-hover:scale-105"
+                    src={project.media.src}
+                    alt={project.title}
+                  />
                 )}
-                <MediaOverlay />
-              </ProjectMedia>
+                <div className="absolute top-0 left-0 h-full w-full bg-[linear-gradient(to_bottom,rgba(0,0,0,0)_70%,rgba(0,0,0,0.8)_100%)]" />
+              </div>
               
-              <ProjectInfo>
-                <ProjectTitle>{project.title}</ProjectTitle>
-                <ProjectDescription>{project.description}</ProjectDescription>
+              <div className="flex grow flex-col p-6">
+                <h3 className="relative mb-4 text-[1.6rem] font-bold text-gold after:absolute after:-bottom-2 after:left-0 after:h-[3px] after:w-10 after:bg-gold after:content-['']">
+                  {project.title}
+                </h3>
+                <p className="mb-4 line-clamp-4 grow leading-[1.6] text-ink">{project.description}</p>
                 
-                <TechUsed>
+                <div className={techUsedClass}>
                   {project.tech.slice(0, 4).map((tech, techIndex) => (
-                    <span key={techIndex}>{tech}</span>
+                    <span key={techIndex} className={techTagClass}>{tech}</span>
                   ))}
-                  {project.tech.length > 4 && <span>+{project.tech.length - 4} more</span>}
-                </TechUsed>
+                  {project.tech.length > 4 && <span className={techTagClass}>+{project.tech.length - 4} more</span>}
+                </div>
                 
-                <ProjectLinks>
+                <div className={projectLinksClass}>
                   <button
                     type="button"
+                    className={projectLinkClass}
                     onClick={(e) => {
                       e.stopPropagation();
                       openProjectDetails(project);
@@ -402,64 +163,89 @@ const Projects = () => {
                   >
                     View Details
                   </button>
-                </ProjectLinks>
-              </ProjectInfo>
-            </ProjectCard>
+                </div>
+              </div>
+            </div>
           ))}
-        </ProjectsGrid>
+        </div>
         
-        {/* Project Details Modal */}
-        <DetailModal show={showModal} onClick={closeModal}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+        <dialog
+          ref={dialogRef}
+          aria-labelledby="project-dialog-title"
+          onClose={closeModal}
+          // Mouse down, not click: a text selection released over the backdrop targets the dialog.
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+          className="m-auto max-h-[90vh] w-[calc(100%-40px)] max-w-[900px] overflow-y-auto rounded-[10px] border border-gold/30 bg-surface p-0 text-ink shadow-[0_15px_30px_rgba(0,0,0,0.3)] backdrop:bg-black/85 max-md:max-h-[80vh]"
+        >
             {selectedProject && (
               <>
-                <ModalHeader>
-                  <h3>{selectedProject.title}</h3>
-                  <CloseButton onClick={closeModal}>×</CloseButton>
-                </ModalHeader>
+                <div className="flex items-center justify-between border-b border-white/10 p-5">
+                  <h3 id="project-dialog-title" className="m-0 text-[2rem] font-bold text-gold">{selectedProject.title}</h3>
+                  <button
+                    type="button"
+                    aria-label="Close project details"
+                    onClick={closeModal}
+                    className="cursor-pointer border-none bg-transparent text-[1.5rem] text-ink transition-all duration-300 ease-[ease] hover:text-gold"
+                  >
+                    ×
+                  </button>
+                </div>
                 
-                <ModalBody>
-                  <div className="modal-media">
+                <div className="p-5">
+                  <div className="mb-5 h-[400px] w-full max-md:h-[250px]">
                     {selectedProject.media.type === 'video' ? (
-                      <video src={selectedProject.media.src} poster={selectedProject.media.poster} controls autoPlay muted playsInline />
+                      <video
+                        className="h-full w-full rounded-[5px] object-cover"
+                        src={selectedProject.media.src}
+                        poster={selectedProject.media.poster}
+                        controls
+                        autoPlay
+                        muted
+                        playsInline
+                      />
                     ) : (
-                      <img src={selectedProject.media.src} alt={selectedProject.title} />
+                      <img
+                        className="h-full w-full rounded-[5px] object-cover"
+                        src={selectedProject.media.src}
+                        alt={selectedProject.title}
+                      />
                     )}
                   </div>
                   
-                  <p>{selectedProject.description}</p>
+                  <p className="mb-5 leading-[1.8] text-ink">{selectedProject.description}</p>
                   
-                  <TechUsed>
-                    <h4 style={{ color: '#d4af37', marginBottom: '10px' }}>Technologies Used:</h4>
+                  <div className={techUsedClass}>
+                    <h4 className="mb-2.5 font-bold text-gold">Technologies Used:</h4>
                     {selectedProject.tech.map((tech, techIndex) => (
-                      <span key={techIndex}>{tech}</span>
+                      <span key={techIndex} className={techTagClass}>{tech}</span>
                     ))}
-                  </TechUsed>
-                </ModalBody>
+                  </div>
+                </div>
                 
-                <ModalFooter>
-                  <div style={{ color: '#a0a0a0' }}>Click outside to close</div>
+                <div className="flex items-center justify-between border-t border-white/10 p-5 max-md:flex-col max-md:gap-[15px]">
+                  <div className="text-muted">Click outside or press Esc to close</div>
                   
-                  <ProjectLinks>
+                  <div className={projectLinksClass}>
                     {selectedProject.links.map((link, linkIndex) => (
                       <a 
                         key={linkIndex} 
                         href={link.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
+                        className={projectLinkClass}
                       >
                         {link.text}
                       </a>
                     ))}
-                  </ProjectLinks>
-                </ModalFooter>
+                  </div>
+                </div>
               </>
             )}
-          </ModalContent>
-        </DetailModal>
-      </Container>
-    </ProjectsSection>
+        </dialog>
+      </div>
+    </section>
   );
 };
 

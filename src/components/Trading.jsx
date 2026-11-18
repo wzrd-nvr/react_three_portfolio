@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import useTradingFeed from '../hooks/useTradingFeed';
 import { isAgentOffline } from '../lib/agentStatus';
-
-const GOLD = '#d4af37';
-const GAIN = '#00e676';
-const LOSS = '#ff6b6b';
-const MUTED = '#8a8a8a';
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const pct = new Intl.NumberFormat('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -15,132 +9,33 @@ const dateTime = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeSty
 const formatUsd = (value) => (typeof value === 'number' ? usd.format(value) : '—');
 const formatPct = (value) => (typeof value === 'number' ? pct.format(value / 100) : '—');
 const formatDate = (value) => (value instanceof Date ? dateTime.format(value) : '—');
-const signColor = (value) => (typeof value !== 'number' || value === 0 ? '#d4d4d4' : value > 0 ? GAIN : LOSS);
+const signClass = (value) => (typeof value !== 'number' || value === 0 ? 'text-ink' : value > 0 ? 'text-emerald' : 'text-coral');
 
-const Section = styled.section`
-  min-height: 100vh;
-  padding: 100px 20px 80px;
-  background-color: #0c0c0c;
-`;
+const cardClass = 'rounded-[10px] border border-line bg-panel px-6 py-5';
+const labelClass = 'mb-[0.4rem] text-[0.8rem] tracking-[0.05em] text-faint uppercase';
+const valueClass = 'text-[1.5rem]';
+const cardTitleClass = 'mb-4 text-[1.1rem] font-bold text-gold';
+const emptyClass = 'text-faint';
+const tableClass =
+  'w-full border-collapse text-[0.9rem] [&_td]:border-b [&_td]:border-rule [&_td]:px-3 [&_td]:py-2 [&_td]:text-right [&_td]:whitespace-nowrap [&_td:first-child]:text-left [&_th]:border-b [&_th]:border-rule [&_th]:px-3 [&_th]:py-2 [&_th]:text-right [&_th]:font-normal [&_th]:whitespace-nowrap [&_th]:text-faint [&_th:first-child]:text-left';
 
-const Container = styled.div`
-  max-width: 1100px;
-  margin: 0 auto;
-`;
+function StatCard({ label, valueClassName = 'text-ink', children }) {
+  return (
+    <div className={cardClass}>
+      <div className={labelClass}>{label}</div>
+      <div className={`${valueClass} ${valueClassName}`}>{children}</div>
+    </div>
+  );
+}
 
-const Header = styled.header`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h2`
-  font-size: 2.5rem;
-  color: ${GOLD};
-`;
-
-const Badge = styled.span`
-  font-size: 0.85rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid ${(props) => props.$color};
-  color: ${(props) => props.$color};
-`;
-
-const Stats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const Card = styled.div`
-  background: #111;
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 2rem;
-
-  ${Stats} & {
-    margin-bottom: 0;
-  }
-`;
-
-const Label = styled.div`
-  font-size: 0.8rem;
-  color: ${MUTED};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.4rem;
-`;
-
-const Value = styled.div`
-  font-size: 1.5rem;
-  color: ${(props) => props.$color || '#d4d4d4'};
-`;
-
-const CardTitle = styled.h3`
-  font-size: 1.1rem;
-  color: ${GOLD};
-  margin-bottom: 1rem;
-`;
-
-const TableWrap = styled.div`
-  overflow-x: auto;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-
-  th,
-  td {
-    padding: 0.5rem 0.75rem;
-    text-align: right;
-    border-bottom: 1px solid #222;
-    white-space: nowrap;
-  }
-
-  th:first-child,
-  td:first-child {
-    text-align: left;
-  }
-
-  th {
-    color: ${MUTED};
-    font-weight: normal;
-  }
-`;
-
-const Empty = styled.p`
-  color: ${MUTED};
-`;
-
-const RunList = styled.ul`
-  list-style: none;
-
-  li + li {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #222;
-  }
-`;
-
-const RunMeta = styled.div`
-  font-size: 0.85rem;
-  color: ${MUTED};
-  margin-bottom: 0.35rem;
-`;
-
-const Disclaimer = styled.p`
-  text-align: center;
-  font-size: 0.85rem;
-  color: ${MUTED};
-`;
+function Panel({ title, children }) {
+  return (
+    <div className={`${cardClass} mb-8`}>
+      <h3 className={cardTitleClass}>{title}</h3>
+      {children}
+    </div>
+  );
+}
 
 const STATUS_REFRESH_MS = 60 * 1000;
 
@@ -159,7 +54,7 @@ const CHART_HEIGHT = 160;
 function EquityChart({ history }) {
   const points = history.filter((entry) => typeof entry.equity_usd === 'number');
   if (points.length < 2) {
-    return <Empty>Not enough history yet.</Empty>;
+    return <p className={emptyClass}>Not enough history yet.</p>;
   }
   const values = points.map((entry) => entry.equity_usd);
   const min = Math.min(...values);
@@ -172,7 +67,7 @@ function EquityChart({ history }) {
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     })
     .join(' ');
-  const color = values[values.length - 1] >= values[0] ? GAIN : LOSS;
+  const strokeClass = values[values.length - 1] >= values[0] ? 'stroke-emerald' : 'stroke-coral';
 
   return (
     <svg
@@ -183,7 +78,7 @@ function EquityChart({ history }) {
       role="img"
       aria-label={`Equity from ${formatUsd(values[0])} to ${formatUsd(values[values.length - 1])}`}
     >
-      <polyline points={coords} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+      <polyline points={coords} fill="none" className={strokeClass} strokeWidth="2" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
@@ -196,46 +91,34 @@ function Trading() {
 
   let body;
   if (error) {
-    body = <Empty role="alert">Live data is unavailable right now.</Empty>;
+    body = <p role="alert" className={emptyClass}>Live data is unavailable right now.</p>;
   } else if (loading) {
-    body = <Empty>Loading live data…</Empty>;
+    body = <p className={emptyClass}>Loading live data…</p>;
   } else {
     const positions = snapshot?.positions || [];
     body = (
       <>
-        <Stats>
-          <Card>
-            <Label>Equity</Label>
-            <Value>{formatUsd(snapshot?.equity_usd)}</Value>
-          </Card>
-          <Card>
-            <Label>Total return</Label>
-            <Value $color={signColor(snapshot?.total_return_usd)}>
-              {formatUsd(snapshot?.total_return_usd)} ({formatPct(snapshot?.total_return_pct)})
-            </Value>
-          </Card>
-          <Card>
-            <Label>Today</Label>
-            <Value $color={signColor(snapshot?.day_change_usd)}>{formatUsd(snapshot?.day_change_usd)}</Value>
-          </Card>
-          <Card>
-            <Label>Last run</Label>
-            <Value>{lastRun ? lastRun.status : '—'}</Value>
-          </Card>
-        </Stats>
+        <div className="mb-8 grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4">
+          <StatCard label="Equity">{formatUsd(snapshot?.equity_usd)}</StatCard>
+          <StatCard label="Total return" valueClassName={signClass(snapshot?.total_return_usd)}>
+            {formatUsd(snapshot?.total_return_usd)} ({formatPct(snapshot?.total_return_pct)})
+          </StatCard>
+          <StatCard label="Today" valueClassName={signClass(snapshot?.day_change_usd)}>
+            {formatUsd(snapshot?.day_change_usd)}
+          </StatCard>
+          <StatCard label="Last run">{lastRun ? lastRun.status : '—'}</StatCard>
+        </div>
 
-        <Card>
-          <CardTitle>Equity</CardTitle>
+        <Panel title="Equity">
           <EquityChart history={history} />
-        </Card>
+        </Panel>
 
-        <Card>
-          <CardTitle>Positions</CardTitle>
+        <Panel title="Positions">
           {positions.length === 0 ? (
-            <Empty>No open positions.</Empty>
+            <p className={emptyClass}>No open positions.</p>
           ) : (
-            <TableWrap>
-              <Table>
+            <div className="overflow-x-auto">
+              <table className={tableClass}>
                 <thead>
                   <tr>
                     <th>Symbol</th>
@@ -252,24 +135,23 @@ function Trading() {
                       <td>{position.quantity}</td>
                       <td>{formatUsd(position.avg_cost_usd)}</td>
                       <td>{formatUsd(position.market_value_usd)}</td>
-                      <td style={{ color: signColor(position.unrealized_pl_usd) }}>
+                      <td className={signClass(position.unrealized_pl_usd)}>
                         {formatUsd(position.unrealized_pl_usd)} ({formatPct(position.unrealized_pl_pct)})
                       </td>
                     </tr>
                   ))}
                 </tbody>
-              </Table>
-            </TableWrap>
+              </table>
+            </div>
           )}
-        </Card>
+        </Panel>
 
-        <Card>
-          <CardTitle>Trades</CardTitle>
+        <Panel title="Trades">
           {trades.length === 0 ? (
-            <Empty>No trades yet.</Empty>
+            <p className={emptyClass}>No trades yet.</p>
           ) : (
-            <TableWrap>
-              <Table>
+            <div className="overflow-x-auto">
+              <table className={tableClass}>
                 <thead>
                   <tr>
                     <th>Submitted</th>
@@ -285,53 +167,58 @@ function Trading() {
                     <tr key={trade.id}>
                       <td>{formatDate(trade.submitted_at)}</td>
                       <td>{trade.symbol}</td>
-                      <td style={{ color: trade.side === 'buy' ? GAIN : LOSS }}>{trade.side}</td>
+                      <td className={trade.side === 'buy' ? 'text-emerald' : 'text-coral'}>{trade.side}</td>
                       <td>{typeof trade.notional_usd === 'number' ? formatUsd(trade.notional_usd) : trade.quantity}</td>
                       <td>{formatUsd(trade.avg_fill_price_usd)}</td>
                       <td>{trade.state}</td>
                     </tr>
                   ))}
                 </tbody>
-              </Table>
-            </TableWrap>
+              </table>
+            </div>
           )}
-        </Card>
+        </Panel>
 
-        <Card>
-          <CardTitle>Recent runs</CardTitle>
+        <Panel title="Recent runs">
           {runs.length === 0 ? (
-            <Empty>No runs yet.</Empty>
+            <p className={emptyClass}>No runs yet.</p>
           ) : (
-            <RunList>
+            <ul className="[&>li+li]:mt-4 [&>li+li]:border-t [&>li+li]:border-rule [&>li+li]:pt-4">
               {runs.map((run) => (
                 <li key={run.id}>
-                  <RunMeta>
+                  <div className="mb-[0.35rem] text-[0.85rem] text-faint">
                     {formatDate(run.started_at)} · {run.status}
                     {run.model ? ` · ${run.model}` : ''}
-                  </RunMeta>
+                  </div>
                   <div>{run.rationale || 'No rationale recorded.'}</div>
                 </li>
               ))}
-            </RunList>
+            </ul>
           )}
-        </Card>
+        </Panel>
       </>
     );
   }
 
   return (
-    <Section>
-      <Container>
-        <Header>
-          <Title>Trading Agent</Title>
+    <section className="min-h-screen bg-surface-deep px-5 pt-[100px] pb-20">
+      <div className="mx-auto max-w-[1100px]">
+        <header className="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+          <h2 className="text-[2.5rem] font-bold text-gold">Trading Agent</h2>
           {!loading && !error && (
-            <Badge $color={offline ? LOSS : GAIN}>{offline ? 'Agent offline' : 'Agent online'}</Badge>
+            <span
+              className={`rounded-full border px-3 py-[0.3rem] text-[0.85rem] ${
+                offline ? 'border-coral text-coral' : 'border-emerald text-emerald'
+              }`}
+            >
+              {offline ? 'Agent offline' : 'Agent online'}
+            </span>
           )}
-        </Header>
+        </header>
         {body}
-        <Disclaimer>Automated experiment. Not investment advice.</Disclaimer>
-      </Container>
-    </Section>
+        <p className="text-center text-[0.85rem] text-faint">Automated experiment. Not investment advice.</p>
+      </div>
+    </section>
   );
 }
 

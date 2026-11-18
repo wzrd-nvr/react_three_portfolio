@@ -1,8 +1,9 @@
+import { vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import Trading from './Trading';
 import useTradingFeed from '../hooks/useTradingFeed';
 
-jest.mock('../hooks/useTradingFeed');
+vi.mock('../hooks/useTradingFeed');
 
 const feed = (overrides) => ({
   snapshot: null,
@@ -82,19 +83,19 @@ test('shows the offline badge when the last run errored', () => {
 });
 
 test('the badge goes offline as time passes without a new run', () => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   try {
-    jest.setSystemTime(new Date(2026, 10, 17, 12));
+    vi.setSystemTime(new Date(2026, 10, 17, 12));
     useTradingFeed.mockReturnValue(feed({ runs: [{ ...recentRun(), started_at: new Date(2026, 10, 16, 15) }] }));
     render(<Trading />);
     expect(screen.getByText('Agent online')).toBeInTheDocument();
 
     act(() => {
-      jest.setSystemTime(new Date(2026, 10, 18, 12));
-      jest.advanceTimersByTime(60 * 1000);
+      vi.setSystemTime(new Date(2026, 10, 18, 12));
+      vi.advanceTimersByTime(60 * 1000);
     });
     expect(screen.getByText('Agent offline')).toBeInTheDocument();
   } finally {
-    jest.useRealTimers();
+    vi.useRealTimers();
   }
 });

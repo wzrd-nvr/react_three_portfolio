@@ -1,16 +1,17 @@
+import { vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { onSnapshot } from 'firebase/firestore';
 import useTradingFeed from './useTradingFeed';
 
-jest.mock('../lib/firebase', () => ({ db: {} }));
+vi.mock('../lib/firebase', () => ({ db: {} }));
 
-jest.mock('firebase/firestore', () => ({
+vi.mock('firebase/firestore', () => ({
   doc: (db, ...path) => ({ path: path.join('/') }),
   collection: (db, name) => ({ path: name }),
   query: (ref, ...constraints) => ({ path: ref.path, constraints }),
   orderBy: (field, direction = 'asc') => ({ orderBy: field, direction }),
   limit: (n) => ({ limit: n }),
-  onSnapshot: jest.fn(),
+  onSnapshot: vi.fn(),
 }));
 
 const timestamp = (iso) => ({ toDate: () => new Date(iso) });
@@ -23,7 +24,7 @@ beforeEach(() => {
   unsubscribes = [];
   onSnapshot.mockImplementation((ref, onNext, onError) => {
     listeners[ref.path] = { ref, onNext, onError };
-    const unsubscribe = jest.fn();
+    const unsubscribe = vi.fn();
     unsubscribes.push(unsubscribe);
     return unsubscribe;
   });

@@ -1,125 +1,4 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-
-const ResumeSection = styled.section`
-  min-height: 100vh;
-  padding: 80px 20px;
-  position: relative;
-  background-color: #0c0c0c;
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 3rem;
-  color: #d4af37;
-  margin-bottom: 2rem;
-  text-align: center;
-  
-  @media (max-width: 768px) {
-    font-size: 2.5rem;
-  }
-`;
-
-const ResumeIntro = styled.div`
-  text-align: center;
-  max-width: 800px;
-  margin-bottom: 3rem;
-  
-  p {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: #d4d4d4;
-  }
-`;
-
-const ResumeContainer = styled.div`
-  width: 100%;
-  max-width: 900px;
-  height: 700px;
-  margin: 0 auto;
-  background: #1b1b1b;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  position: relative;
-  
-  @media (max-width: 768px) {
-    height: 500px;
-  }
-`;
-
-const PDFEmbed = styled.iframe`
-  width: 100%;
-  height: 100%;
-  border: none;
-  background-color: #ffffff;
-`;
-
-const DownloadButton = styled.a`
-  display: inline-block;
-  margin-top: 2rem;
-  padding: 1rem 2rem;
-  background: #d4af37;
-  color: #000;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: #a98c37;
-    transform: translateY(-3px);
-  }
-  
-  &:active {
-    transform: translateY(1px);
-  }
-`;
-
-const DebugInfo = styled.div`
-  margin: 1rem 0;
-  padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 5px;
-  border: 1px solid #555;
-  color: #d4d4d4;
-  text-align: left;
-  font-size: 0.9rem;
-  margin-top: 2rem;
-  display: ${props => props.show ? 'block' : 'none'};
-`;
-
-const ErrorMessage = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #ff5252;
-  font-size: 1.2rem;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 80%;
-`;
-
-const LoadingMessage = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #d4d4d4;
-  font-size: 1.2rem;
-`;
 
 const Resume = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -127,7 +6,7 @@ const Resume = () => {
   const [debugMode, setDebugMode] = useState(false);
   
   // Path to your resume PDF
-  const resumePath = process.env.PUBLIC_URL + "Angel_Nivar_Resume_Sep 2025.pdf";
+  const resumePath = import.meta.env.BASE_URL + "Angel_Nivar_Resume_Sep 2025.pdf";
   
   const handleLoadError = () => {
     setIsLoading(false);
@@ -140,73 +19,76 @@ const Resume = () => {
   };
   
   return (
-    <ResumeSection id="resume">
-      <Container>
-        <SectionTitle>My Resume</SectionTitle>
+    <section id="resume" className="relative min-h-screen bg-surface-deep px-5 py-20">
+      <div className="relative z-[1] mx-auto flex max-w-[1200px] flex-col items-center">
+        <h2 className="mb-8 text-center text-[3rem] font-bold text-gold max-md:text-[2.5rem]">My Resume</h2>
         
-        <ResumeIntro>
-          <p>
+        <div className="mb-12 max-w-[800px] text-center">
+          <p className="text-[1.2rem] leading-[1.8] text-ink">
             Below you'll find my professional resume highlighting my skills, 
             experience, and qualifications. Feel free to download a copy for your records.
           </p>
-        </ResumeIntro>
+        </div>
         
-        <ResumeContainer>
-          {isLoading && <LoadingMessage>Loading resume...</LoadingMessage>}
+        <div className="relative mx-auto h-[700px] w-full max-w-[900px] overflow-hidden rounded-[10px] bg-surface shadow-[0_10px_30px_rgba(0,0,0,0.3)] max-md:h-[500px]">
+          {isLoading && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[1.2rem] text-ink">
+              Loading resume...
+            </div>
+          )}
           {hasError && (
-            <ErrorMessage>
+            <div className="absolute top-1/2 left-1/2 max-w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-[10px] bg-black/70 p-8 text-center text-[1.2rem] text-[#ff5252]">
               <p>Unable to load the resume PDF.</p>
               <p>Please ensure the PDF file is in the public folder.</p>
               <p>Click the download button below to view the resume.</p>
-            </ErrorMessage>
+            </div>
           )}
-          <PDFEmbed 
+          <iframe 
+            className="h-full w-full border-none bg-white"
             src={resumePath}
             onLoad={() => setIsLoading(false)}
             onError={handleLoadError}
             title="Angel Nivar Resume"
             type="application/pdf"
           />
-        </ResumeContainer>
+        </div>
         
-        <DownloadButton 
+        <a 
           href={resumePath} 
           download="Angel_Nivar_Resume.pdf"
           target="_blank"
           rel="noopener noreferrer"
+          className="mt-8 inline-block rounded-[5px] bg-gold px-8 py-4 font-bold text-space no-underline transition-all duration-300 ease-[ease] hover:-translate-y-[3px] hover:bg-gold-deep active:translate-y-px"
         >
           Download Resume
-        </DownloadButton>
+        </a>
         
-        <div style={{ marginTop: '10px', textAlign: 'center' }}>
+        <div className="mt-2.5 text-center">
           <button 
             onClick={toggleDebug} 
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: '#777', 
-              cursor: 'pointer',
-              fontSize: '0.8rem',
-              textDecoration: 'underline'
-            }}
+            className="cursor-pointer border-none bg-transparent text-[0.8rem] text-[#777] underline"
           >
             {debugMode ? 'Hide Debug Info' : 'Show Debug Info'}
           </button>
         </div>
         
-        <DebugInfo show={debugMode}>
+        <div
+          className={`mt-8 mb-4 rounded-[5px] border border-[#555] bg-black/70 p-4 text-left text-[0.9rem] text-ink ${
+            debugMode ? 'block' : 'hidden'
+          }`}
+        >
           <p>Resume Path: {resumePath}</p>
           <p>Loading State: {isLoading ? 'Loading' : 'Not Loading'}</p>
           <p>Error State: {hasError ? 'Error' : 'No Error'}</p>
           <p>Notes on PDF display:</p>
-          <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
+          <ul className="mt-2.5 list-disc pl-5">
             <li>PDF must be in the public folder named "resume.pdf"</li>
             <li>Check your browser console for additional errors</li>
             <li>Some browsers have restrictions on iframe PDF embedding</li>
           </ul>
-        </DebugInfo>
-      </Container>
-    </ResumeSection>
+        </div>
+      </div>
+    </section>
   );
 };
 
