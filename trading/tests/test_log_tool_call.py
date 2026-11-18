@@ -114,6 +114,53 @@ def test_account_number_is_removed_from_free_text_in_the_input():
     assert entry["tool_input"]["note"] == "orders for [REDACTED]"
 
 
+OTHER_ACCOUNT = "900000002"
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"tool_input": {"account_number": ACCOUNT}, "tool_response": json.dumps({"note": f"see {OTHER_ACCOUNT}."})},
+        {"tool_input": {}, "tool_response": json.dumps({"ref": OTHER_ACCOUNT})},
+        {"tool_input": {}, "tool_response": f'{{"account_number":"{OTHER_ACCOUNT}"'},
+        {"tool_input": {"account_number": int(ACCOUNT)}, "tool_response": json.dumps({"note": f"acct {ACCOUNT}"})},
+        {"tool_input": {"note": f"acct {OTHER_ACCOUNT}"}, "tool_response": "{}"},
+        {"tool_input": {}, "tool_response": json.dumps({OTHER_ACCOUNT: "keyed by account"})},
+    ],
+)
+def test_account_like_numbers_are_removed_from_success_logs(overrides):
+    entry = logged(run(event("get_portfolio", **overrides)))
+    text = json.dumps(entry, default=str)
+    assert ACCOUNT not in text
+    assert OTHER_ACCOUNT not in text
+
+
+@pytest.mark.parametrize("account", ["ACCT1234", 12345678])
+def test_the_input_account_is_removed_even_in_an_unusual_format(account):
+    response = json.dumps({"note": f"acct {account}"})
+    entry = logged(run(event("get_portfolio", tool_input={"account_number": account}, tool_response=response)))
+    assert entry["tool_response"]["note"] == "acct [REDACTED]"
+
+
+def test_account_like_numbers_are_removed_from_errors_without_account_input():
+    entry = logged(run(event("get_portfolio", "PostToolUseFailure", tool_input={}, error=f"account {ACCOUNT}: 401")))
+    assert entry["tool_response"] == "account [REDACTED]: 401"
+
+
+def test_account_like_numbers_are_removed_from_deny_reasons():
+    entry = logged(run(event("place_equity_order", "PermissionDenied", tool_input={}, reason=f"blocked {ACCOUNT}")))
+    assert entry["deny_reason"] == "blocked [REDACTED]"
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["3400000000.00", "351.880000", "12345678", "1795019133861", "2026-11-18T20:03:45.447320123Z"],
+)
+def test_market_data_is_not_mistaken_for_an_account_number(value):
+    entry = logged(run(event(tool_response=json.dumps({"data": {"value": value}}))))
+    assert entry["tool_response"]["data"]["value"] == value
+
+
 def test_permission_denied_records_the_reason():
     entry = logged(run(event("place_equity_order", "PermissionDenied", reason="not allowed")))
     assert entry["event"] == "PermissionDenied"

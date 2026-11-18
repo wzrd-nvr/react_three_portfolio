@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 import traceback
 from collections.abc import Callable
@@ -16,6 +17,11 @@ ERROR_LOG = "hook_errors.log"
 FIRESTORE_TIMEOUT_SECONDS = 10
 MAX_TOOL_INPUT_BYTES = 50_000
 MAX_TOOL_RESPONSE_BYTES = 800_000
+REDACTED = "[REDACTED]"
+# Robinhood account numbers are 9 or 12 digits. The lookbehind spares fractional
+# seconds and decimals; DECIMAL_VALUE spares prices and volumes such as "3400000000.00".
+ACCOUNT_LIKE = re.compile(r"(?<!\d)(?<!\d\.)\d{9,12}(?!\d)")
+DECIMAL_VALUE = re.compile(r"-?\d+\.\d+")
 
 
 def record_error(step: str) -> None:
@@ -80,20 +86,28 @@ def update_session_state(event: dict, now: datetime) -> None:
             session_state.update(event["session_id"], lambda s: s.setdefault("reviews", []).append(review))
 
 
-def mask(value: Any, secret: Any) -> Any:
-    if not isinstance(secret, str) or not secret:
-        return value
+def mask_text(text: str, secret: str | None) -> str:
+    if secret:
+        text = text.replace(secret, REDACTED)
+    return text if DECIMAL_VALUE.fullmatch(text) else ACCOUNT_LIKE.sub(REDACTED, text)
+
+
+def mask(value: Any, secret: str | None) -> Any:
     if isinstance(value, dict):
         return {mask(key, secret): mask(item, secret) for key, item in value.items()}
     if isinstance(value, list):
         return [mask(item, secret) for item in value]
-    return value.replace(secret, "[REDACTED]") if isinstance(value, str) else value
+    return mask_text(value, secret) if isinstance(value, str) else value
+
+
+def account_text(account: Any) -> str | None:
+    return str(account) if isinstance(account, (str, int)) and not isinstance(account, bool) else None
 
 
 def log_entry(event: dict, now: datetime) -> dict:
     name = event["hook_event_name"]
     tool_input = event.get("tool_input") or {}
-    account = tool_input.get(fields.ACCOUNT_PARAM)
+    account = account_text(tool_input.get(fields.ACCOUNT_PARAM))
     result = event.get("error") if name == "PostToolUseFailure" else event.get("tool_response")
     clean_input, input_cut = store.truncate(mask(redact(tool_input), account), MAX_TOOL_INPUT_BYTES)
     clean_result, result_cut = store.truncate(
