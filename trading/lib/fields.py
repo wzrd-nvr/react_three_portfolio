@@ -2,7 +2,23 @@
 # trading/fixtures/. Every other module reads Robinhood data only through this
 # file. Numeric values arrive as decimal strings ("351.900000"), never floats.
 
+import json
+from typing import Any
+
 TOOL_PREFIX = "mcp__robinhood__"
+TOOL_QUOTES = "get_equity_quotes"
+TOOL_REVIEW = "review_equity_order"
+
+
+def response_payload(tool_response: Any) -> Any:
+    """Decode a hook's tool_response, which Robinhood tools deliver as a JSON string."""
+    if not isinstance(tool_response, str):
+        return tool_response
+    try:
+        return json.loads(tool_response)
+    except ValueError:
+        return tool_response
+
 
 # Every account-scoped tool takes the same parameter, filled from
 # get_accounts.data.accounts[].account_number.
@@ -38,6 +54,18 @@ ORDER_STOP_PRICE = "stop_price"
 ORDER_TIME_IN_FORCE = "time_in_force"  # "gfd" | "gtc"
 ORDER_MARKET_HOURS = "market_hours"  # "regular_hours" | "extended_hours" | "all_day_hours"
 
+ORDER_INPUT_FIELDS = (
+    ORDER_SYMBOL,
+    ORDER_SIDE,
+    ORDER_TYPE,
+    ORDER_QUANTITY,
+    ORDER_DOLLAR_AMOUNT,
+    ORDER_LIMIT_PRICE,
+    ORDER_STOP_PRICE,
+    ORDER_TIME_IN_FORCE,
+    ORDER_MARKET_HOURS,
+)
+
 # review_equity_order response: data.*
 REVIEW_DATA = ("data",)
 REVIEW_ORDER_CHECKS = "order_checks"  # {} when there are no broker alerts
@@ -50,7 +78,8 @@ QUOTE_SYMBOL = "symbol"
 QUOTE_ASK = "ask_price"
 QUOTE_BID = "bid_price"
 QUOTE_LAST_TRADE = "last_trade_price"
-QUOTE_STATE = "state"  # "active" when tradable
+QUOTE_STATE = "state"
+QUOTE_STATE_ACTIVE = "active"
 
 # get_portfolio response: data.*
 PORTFOLIO = ("data",)
