@@ -202,7 +202,33 @@ SECRET_TEXTS = [
     '{\\"access_token\\":\\"s3cr3t one s3cr3t two s3cr3t three\\"}',
     '{"client_secret":"s3cr3t one s3cr3t two s3cr3t three',
     "{'access_token': 's3cr3t one s3cr3t two s3cr3t three'}",
+    r'{\"client_secret\": \"first\\\"s3cr3t-suffix\"}',
+    r'{\"client_secret\":\"prefix\\\"s3cr3t-value\\\"s3cr3t-end\"}',
+    r'{\"client_secret\":\"back\\\\slash s3cr3t\\ns3cr3t-value\"}',
+    r'{\"client_secret\":\"first\ns3cr3t-value\"}',
+    r'{\"client_secret\":\"first\\"s3cr3t-value\"}',
 ]
+
+
+def test_escaped_quotes_inside_a_sensitive_value_are_removed_from_deny_reasons():
+    reason = r'blocked {\"client_secret\":\"prefix\\\"s3cr3t-value\"}'
+    entry = logged(run(event(name="PermissionDenied", reason=reason)))
+    assert entry["deny_reason"] == r"blocked {\"client_secret\":[REDACTED]}"
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (r"\"s3cr3t\"", "[REDACTED]"),
+        (r"\"s3cr3t\\\"more\"", "[REDACTED]"),
+        (r"\"s3cr3t\\\\\"", "[REDACTED]"),
+    ],
+)
+def test_text_after_an_escaped_sensitive_value_is_kept(value, expected):
+    text = rf'{{\"access_token\":{value},\"symbol\":\"AAPL\"}}'
+    assert logged(run(event(tool_response=text)))["tool_response"] == (
+        rf'{{\"access_token\":{expected},\"symbol\":\"AAPL\"}}'
+    )
 
 
 @pytest.mark.parametrize("text", SECRET_TEXTS)
@@ -238,7 +264,7 @@ def test_error_text_without_sensitive_pairs_is_unchanged():
     assert logged(run(event(name="PostToolUseFailure", error=error)))["tool_response"] == error
 
 
-@pytest.mark.parametrize("text", ["a" * 400_000, "token" * 80_000])
+@pytest.mark.parametrize("text", ["a" * 400_000, "token" * 80_000, 'token=\\"' + "\\" * 400_000])
 def test_scrubbing_long_unbroken_text_stays_fast(text):
     started = time.monotonic()
     run(event(tool_response=text))

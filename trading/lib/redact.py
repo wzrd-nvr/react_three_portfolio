@@ -5,11 +5,12 @@ SENSITIVE_KEY = re.compile(r"token|secret|authorization|account_number|account_i
 REDACTED = "[REDACTED]"
 # Matches key=value and key: value pairs in raw text, including cut-off and escaped JSON.
 # The key suffix is bounded so that long unbroken text cannot make the scan quadratic.
+# In escaped JSON a value closes at \" while an embedded quote is encoded as \\\".
 SENSITIVE_PAIR = re.compile(
     rf"""
     ((?:{SENSITIVE_KEY.pattern})[\w-]{{0,64}}\\*["']?\s*[:=]\s*)
     (?:
-        \\"(?:(?!\\").)*(?:\\")?
+        \\"(?:[^\\]|\\{{4}}|\\{{2}}.|\\(?!"))*(?:\\")?
         | "(?:[^"\\]|\\.)*"?
         | '(?:[^'\\]|\\.)*'?
         | (?:[A-Za-z][\w-]*[ \t]+)?[^\s,;&}}\]]+
