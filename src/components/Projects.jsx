@@ -173,7 +173,8 @@ const Projects = () => {
           ref={dialogRef}
           aria-labelledby="project-dialog-title"
           onClose={closeModal}
-          onClick={(e) => {
+          // Mouse down, not click: a text selection released over the backdrop targets the dialog.
+          onMouseDown={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
           className="m-auto max-h-[90vh] w-[calc(100%-40px)] max-w-[900px] overflow-y-auto rounded-[10px] border border-gold/30 bg-surface p-0 text-ink shadow-[0_15px_30px_rgba(0,0,0,0.3)] backdrop:bg-black/85 max-md:max-h-[80vh]"
