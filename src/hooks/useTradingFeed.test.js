@@ -55,6 +55,22 @@ test('every list query carries a limit the security rules accept', () => {
   expect(limitOf('public_runs')).toBeLessThanOrEqual(50);
 });
 
+test('history keeps the newest days and returns them oldest first', () => {
+  const { result } = renderHook(() => useTradingFeed());
+  const { constraints } = listeners.public_equity_history.ref;
+  expect(constraints).toContainEqual({ orderBy: 'date', direction: 'desc' });
+
+  act(() => {
+    listeners.public_equity_history.onNext(
+      querySnap([
+        { id: '2026-11-18', date: '2026-11-18', equity_usd: 15.2 },
+        { id: '2026-11-17', date: '2026-11-17', equity_usd: 15 },
+      ]),
+    );
+  });
+  expect(result.current.history.map((entry) => entry.date)).toEqual(['2026-11-17', '2026-11-18']);
+});
+
 test('stays loading until all four feeds have delivered', () => {
   const { result } = renderHook(() => useTradingFeed());
   expect(result.current.loading).toBe(true);

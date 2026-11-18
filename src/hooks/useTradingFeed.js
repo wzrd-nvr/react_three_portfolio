@@ -51,9 +51,9 @@ export default function useTradingFeed() {
         onError,
       ),
       onSnapshot(
-        query(collection(db, 'public_equity_history'), orderBy('date'), limit(365)),
+        query(collection(db, 'public_equity_history'), orderBy('date', 'desc'), limit(365)),
         (snap) => {
-          setState((prev) => ({ ...prev, history: listDocs(snap, ['updated_at']) }));
+          setState((prev) => ({ ...prev, history: listDocs(snap, ['updated_at']).reverse() }));
           markReceived('history');
         },
         onError,
