@@ -329,6 +329,20 @@ const CameraRig = ({ controllerRef, busyRef, reducedMotion }) => {
     // Only the first mount gets the intro zoom; resizes should not replay it.
   }, []);
 
+  // Turning on reduced motion mid-flight jumps every pending tween to its end, so callbacks
+  // still run: a flag flight still navigates and a bounce still releases busyRef.
+  useEffect(() => {
+    if (!reducedMotion) return;
+    while (tween.current) {
+      const active = tween.current;
+      tween.current = null;
+      camera.position.copy(active.toPosition);
+      look.copy(active.toLook);
+      camera.lookAt(look);
+      active.onComplete?.();
+    }
+  }, [reducedMotion, camera, look]);
+
   controllerRef.current = {
     flyTo(target, { onArrive, returnAfter = false }) {
       if (busyRef.current) return;
@@ -404,6 +418,14 @@ const Flag = ({ route, index, gradient, reducedMotion, fontLoaded, onSelect }) =
     },
     [texture, geometry]
   );
+
+  useEffect(() => {
+    if (!reducedMotion) return;
+    const positions = geometry.attributes.position;
+    for (let i = 0; i < positions.count; i++) positions.setZ(i, 0);
+    positions.needsUpdate = true;
+    geometry.computeVertexNormals();
+  }, [reducedMotion, geometry]);
 
   useFrame((state, delta) => {
     const time = state.clock.elapsedTime;
@@ -558,6 +580,14 @@ const useGlobeDrag = (globeRef, busyRef, reducedMotion) => {
     spinVelocity: 0,
     autoSpin: reducedMotion ? 0 : AUTO_SPIN_SPEED,
   });
+
+  useEffect(() => {
+    if (!reducedMotion) return;
+    const m = motion.current;
+    m.autoSpin = 0;
+    m.spinVelocity = 0;
+    m.tiltVelocity = 0;
+  }, [reducedMotion]);
 
   useEffect(() => {
     const canvas = gl.domElement;
