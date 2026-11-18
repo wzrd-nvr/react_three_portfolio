@@ -22,6 +22,9 @@ const SimpleNav = () => {
     <nav className="fixed top-[30px] right-[30px] z-100">
       <button
         className="group bg-transparent border-none cursor-pointer flex flex-col gap-[5px] p-0 transition-all duration-300 ease-[ease]"
+        aria-label="Toggle navigation"
+        aria-expanded={dropdownOpen}
+        aria-controls="site-navigation-menu"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
         <span className={`${barClass} ${dropdownOpen ? 'transform-[rotate(45deg)_translate(6px,6px)]' : ''}`}></span>
@@ -30,6 +33,8 @@ const SimpleNav = () => {
       </button>
       
       <div
+        id="site-navigation-menu"
+        inert={!dropdownOpen}
         className={`absolute top-[45px] right-0 bg-surface/95 rounded-[5px] border border-gold/50 backdrop-blur-[10px] w-[150px] shadow-[0_5px_15px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-300 ease-[ease] z-25 ${
           dropdownOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2.5 pointer-events-none'
         }`}

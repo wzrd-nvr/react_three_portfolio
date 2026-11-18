@@ -254,19 +254,39 @@ const useToonGradient = () =>
     return texture;
   }, []);
 
-const usePrefersReducedMotion = () =>
-  useMemo(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, []);
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+const FONT_WAIT_MS = 2500;
 
-const useFontReady = (font) => {
-  const [ready, setReady] = useState(false);
+const usePrefersReducedMotion = () => {
+  const [reduced, setReduced] = useState(() => window.matchMedia?.(REDUCED_MOTION_QUERY).matches ?? false);
+  useEffect(() => {
+    const query = window.matchMedia?.(REDUCED_MOTION_QUERY);
+    if (!query) return undefined;
+    const update = () => setReduced(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  return reduced;
+};
+
+// Flags wait briefly for the label font, then fall back to the system monospace so a slow or
+// stalled font request never hides navigation. Labels repaint once the real font arrives.
+const useLabelFont = (font) => {
+  const [state, setState] = useState({ ready: false, loaded: false });
   useEffect(() => {
     let cancelled = false;
-    document.fonts.load(font).finally(() => !cancelled && setReady(true));
+    const fallback = setTimeout(() => !cancelled && setState((s) => ({ ...s, ready: true })), FONT_WAIT_MS);
+    document.fonts
+      .load(font)
+      .then(() => !cancelled && setState({ ready: true, loaded: true }))
+      .catch(() => !cancelled && setState((s) => ({ ...s, ready: true })))
+      .finally(() => clearTimeout(fallback));
     return () => {
       cancelled = true;
+      clearTimeout(fallback);
     };
   }, [font]);
-  return ready;
+  return state;
 };
 
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
@@ -353,7 +373,7 @@ const CameraRig = ({ controllerRef, busyRef, reducedMotion }) => {
   return null;
 };
 
-const Flag = ({ route, index, gradient, reducedMotion, onSelect }) => {
+const Flag = ({ route, index, gradient, reducedMotion, fontLoaded, onSelect }) => {
   const { camera, gl } = useThree();
   const rootRef = useRef();
   const pivotRef = useRef();
@@ -364,7 +384,8 @@ const Flag = ({ route, index, gradient, reducedMotion, onSelect }) => {
 
   const position = useMemo(() => latLonToVector3(route.lat, route.lon, GLOBE_RADIUS), [route]);
   const orientation = useMemo(() => surfaceOrientation(position), [position]);
-  const texture = useMemo(() => buildFlagTexture(route.label, route.color), [route]);
+  // fontLoaded is a dependency only so the label repaints once the real font is available.
+  const texture = useMemo(() => buildFlagTexture(route.label, route.color), [route, fontLoaded]);
   const geometry = useMemo(() => {
     const plane = new THREE.PlaneGeometry(FLAG_WIDTH, FLAG_HEIGHT, 12, 6);
     plane.translate(FLAG_WIDTH / 2, 0, 0);
@@ -642,7 +663,7 @@ const usePointerInside = () => {
 const GlobeScene = ({ onNavigate, onDeparture }) => {
   const reducedMotion = usePrefersReducedMotion();
   const gradient = useToonGradient();
-  const fontReady = useFontReady('700 64px "Roboto Mono"');
+  const labelFont = useLabelFont('700 64px "Roboto Mono"');
   const globeRef = useRef();
   const cameraRef = useRef();
   const busyRef = useRef(false);
@@ -692,7 +713,7 @@ const GlobeScene = ({ onNavigate, onDeparture }) => {
           <sphereGeometry args={[GLOBE_RADIUS, 48, 48]} />
           <meshBasicMaterial color={COLORS.outline} side={THREE.BackSide} />
         </mesh>
-        {fontReady &&
+        {labelFont.ready &&
           ROUTES.map((route, index) => (
             <Flag
               key={route.label}
@@ -700,6 +721,7 @@ const GlobeScene = ({ onNavigate, onDeparture }) => {
               index={index}
               gradient={gradient}
               reducedMotion={reducedMotion}
+              fontLoaded={labelFont.loaded}
               onSelect={handleSelect}
             />
           ))}

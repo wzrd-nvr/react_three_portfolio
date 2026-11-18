@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 
 const renderAt = (path) => {
@@ -21,4 +21,18 @@ test('inner pages render the menu with links to every section', () => {
   for (const name of ['Home', 'About', 'Projects', 'Goals', 'Resume', 'Contact']) {
     expect(screen.getByRole('link', { name })).toBeInTheDocument();
   }
+});
+
+test('inner-page menu toggle is named, reports its state, and keeps closed links out of reach', () => {
+  renderAt('/about');
+  const toggle = screen.getByRole('button', { name: 'Toggle navigation' });
+  const menu = document.getElementById(toggle.getAttribute('aria-controls'));
+
+  expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  expect(menu).toHaveAttribute('inert');
+
+  fireEvent.click(toggle);
+
+  expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  expect(menu).not.toHaveAttribute('inert');
 });

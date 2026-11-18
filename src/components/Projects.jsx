@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const techTagClass =
   'mr-2 mb-2 inline-block rounded-[15px] border border-gold/20 bg-gold/10 px-2.5 py-1 text-ink';
@@ -13,6 +13,13 @@ const techUsedClass = 'my-4 text-[0.9rem] text-muted';
 const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (showModal && !dialog.open) dialog.showModal();
+    else if (!showModal && dialog.open) dialog.close();
+  }, [showModal]);
   
   // Lock/unlock body scroll when modal opens/closes
   useEffect(() => {
@@ -162,22 +169,22 @@ const Projects = () => {
           ))}
         </div>
         
-        {/* Project Details Modal */}
-        <div
-          onClick={closeModal}
-          className={`fixed top-0 left-0 z-[1000] flex h-full w-full items-center justify-center bg-black/85 p-5 transition-all duration-300 ease-[ease] ${
-            showModal ? 'visible opacity-100' : 'invisible opacity-0'
-          }`}
+        <dialog
+          ref={dialogRef}
+          aria-labelledby="project-dialog-title"
+          onClose={closeModal}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+          className="m-auto max-h-[90vh] w-[calc(100%-40px)] max-w-[900px] overflow-y-auto rounded-[10px] border border-gold/30 bg-surface p-0 text-ink shadow-[0_15px_30px_rgba(0,0,0,0.3)] backdrop:bg-black/85 max-md:max-h-[80vh]"
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="flex max-h-[90vh] w-full max-w-[900px] flex-col overflow-y-auto rounded-[10px] border border-gold/30 bg-surface shadow-[0_15px_30px_rgba(0,0,0,0.3)] max-md:max-h-[80vh]"
-          >
             {selectedProject && (
               <>
                 <div className="flex items-center justify-between border-b border-white/10 p-5">
-                  <h3 className="m-0 text-[2rem] font-bold text-gold">{selectedProject.title}</h3>
+                  <h3 id="project-dialog-title" className="m-0 text-[2rem] font-bold text-gold">{selectedProject.title}</h3>
                   <button
+                    type="button"
+                    aria-label="Close project details"
                     onClick={closeModal}
                     className="cursor-pointer border-none bg-transparent text-[1.5rem] text-ink transition-all duration-300 ease-[ease] hover:text-gold"
                   >
@@ -217,7 +224,7 @@ const Projects = () => {
                 </div>
                 
                 <div className="flex items-center justify-between border-t border-white/10 p-5 max-md:flex-col max-md:gap-[15px]">
-                  <div className="text-muted">Click outside to close</div>
+                  <div className="text-muted">Click outside or press Esc to close</div>
                   
                   <div className={projectLinksClass}>
                     {selectedProject.links.map((link, linkIndex) => (
@@ -227,7 +234,6 @@ const Projects = () => {
                         target="_blank" 
                         rel="noopener noreferrer"
                         className={projectLinkClass}
-                        onClick={(e) => e.stopPropagation()}
                       >
                         {link.text}
                       </a>
@@ -236,8 +242,7 @@ const Projects = () => {
                 </div>
               </>
             )}
-          </div>
-        </div>
+        </dialog>
       </div>
     </section>
   );

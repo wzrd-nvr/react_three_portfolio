@@ -76,6 +76,8 @@ const Navigation = () => {
       <div className="absolute top-[30px] right-[30px] z-20">
         <button
           className="bg-surface/80 text-gold px-[15px] py-2.5 rounded-[5px] border border-gold/50 backdrop-blur-[10px] cursor-pointer flex items-center gap-[5px] font-sans text-[13.333px] leading-[normal] transition-all duration-300 ease-[ease] hover:bg-gold/30"
+          aria-expanded={dropdownOpen}
+          aria-controls="globe-navigation-menu"
           onClick={() => setDropdownOpen(!dropdownOpen)}
         >
           Menu
@@ -87,6 +89,8 @@ const Navigation = () => {
           </svg>
         </button>
         <div
+          id="globe-navigation-menu"
+          inert={!dropdownOpen}
           className={`absolute top-[45px] right-0 bg-surface/95 rounded-[5px] border border-gold/50 backdrop-blur-[10px] w-[150px] shadow-[0_5px_15px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-300 ease-[ease] z-25 ${
             dropdownOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2.5 pointer-events-none'
           }`}
