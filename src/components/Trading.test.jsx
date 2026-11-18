@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import Trading from './Trading';
 import useTradingFeed from '../hooks/useTradingFeed';
 
@@ -79,4 +79,22 @@ test('shows the offline badge when the last run errored', () => {
   useTradingFeed.mockReturnValue(feed({ runs: [{ ...recentRun(), status: 'error' }] }));
   render(<Trading />);
   expect(screen.getByText('Agent offline')).toBeInTheDocument();
+});
+
+test('the badge goes offline as time passes without a new run', () => {
+  jest.useFakeTimers();
+  try {
+    jest.setSystemTime(new Date(2026, 10, 17, 12));
+    useTradingFeed.mockReturnValue(feed({ runs: [{ ...recentRun(), started_at: new Date(2026, 10, 16, 15) }] }));
+    render(<Trading />);
+    expect(screen.getByText('Agent online')).toBeInTheDocument();
+
+    act(() => {
+      jest.setSystemTime(new Date(2026, 10, 18, 12));
+      jest.advanceTimersByTime(60 * 1000);
+    });
+    expect(screen.getByText('Agent offline')).toBeInTheDocument();
+  } finally {
+    jest.useRealTimers();
+  }
 });

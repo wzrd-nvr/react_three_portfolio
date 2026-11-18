@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useTradingFeed from '../hooks/useTradingFeed';
 import { isAgentOffline } from '../lib/agentStatus';
@@ -142,6 +142,17 @@ const Disclaimer = styled.p`
   color: ${MUTED};
 `;
 
+const STATUS_REFRESH_MS = 60 * 1000;
+
+function useNow(intervalMs) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
+
 const CHART_WIDTH = 600;
 const CHART_HEIGHT = 160;
 
@@ -179,8 +190,9 @@ function EquityChart({ history }) {
 
 function Trading() {
   const { snapshot, trades, history, runs, loading, error } = useTradingFeed();
+  const now = useNow(STATUS_REFRESH_MS);
   const lastRun = runs[0] || null;
-  const offline = isAgentOffline(lastRun);
+  const offline = isAgentOffline(lastRun, now);
 
   let body;
   if (error) {
