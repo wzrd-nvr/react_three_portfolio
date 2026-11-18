@@ -45,6 +45,7 @@ const SimpleNav = () => {
         <Link to="/goals" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Goals</Link>
         <Link to="/resume" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Resume</Link>
         <Link to="/contact" className={`${dropdownItemClass} ${hoverClasses.coral}`}>Contact</Link>
+        <Link to="/trading" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Trading</Link>
         <a 
           href="https://github.com/Lactoseandtolerance" 
           target="_blank" 

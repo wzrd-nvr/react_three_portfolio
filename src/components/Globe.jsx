@@ -48,6 +48,7 @@ const ROUTES = [
   { label: 'Goals', path: '/goals', lat: -33.8688, lon: 151.2093, color: '#00e676' },
   { label: 'Resume', path: '/resume', lat: 51.5074, lon: -0.1278, color: '#00e676' },
   { label: 'Contact', path: '/contact', lat: 35.6762, lon: 139.6503, color: '#ff6b6b' },
+  { label: 'Trading', path: '/trading', lat: 37.7749, lon: -122.4194, color: '#00e676' },
   { label: 'GitHub', url: 'https://github.com/Lactoseandtolerance', lat: -22.9068, lon: -43.1729, color: '#2464eb' },
   { label: 'LinkedIn', url: 'https://www.linkedin.com/in/angel-nivar-a00740275/', lat: 1.3521, lon: 103.8198, color: '#0077b5' },
 ];

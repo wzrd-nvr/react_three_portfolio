@@ -100,6 +100,7 @@ const Navigation = () => {
           <Link to="/goals" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Goals</Link>
           <Link to="/resume" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Resume</Link>
           <Link to="/contact" className={`${dropdownItemClass} ${hoverClasses.coral}`}>Contact</Link>
+          <Link to="/trading" className={`${dropdownItemClass} ${hoverClasses.emerald}`}>Trading</Link>
           <a href="https://github.com/Lactoseandtolerance" target="_blank" rel="noopener noreferrer" className={`${dropdownItemClass} ${hoverClasses.github}`}>GitHub</a>
           <a href="https://www.linkedin.com/in/angel-nivar-a00740275/" target="_blank" rel="noopener noreferrer" className={`${dropdownItemClass} ${hoverClasses.linkedin}`}>LinkedIn</a>
         </div>
