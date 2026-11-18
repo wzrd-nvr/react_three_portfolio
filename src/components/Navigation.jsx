@@ -302,6 +302,7 @@ const Earth = ({ setHoveredSection }) => {
   // Tokyo: 35.6762° N, 139.6503° E
   // Rio de Janeiro: 22.9068° S, 43.1729° W (GitHub)
   // Singapore: 1.3521° N, 103.8198° E (LinkedIn)
+  // San Francisco: 37.7749° N, 122.4194° W (Trading)
   const navigationPoints = [
     { 
       section: 'about', 
@@ -341,6 +342,14 @@ const Earth = ({ setHoveredSection }) => {
       position: latLongToVector3(35.6762, 139.6503, 1.5),  // Tokyo
       rotation: [0, 0, 0],
       color: "#ff6b6b",  // Soft red color
+      type: 'internal'
+    },
+    { 
+      section: 'trading', 
+      label: 'Trading', 
+      position: latLongToVector3(37.7749, -122.4194, 1.5),  // San Francisco
+      rotation: [0, 0, 0],
+      color: "#00e676",
       type: 'internal'
     },
     { 
@@ -626,6 +635,7 @@ const Navigation = () => {
           <DropdownItem to="/goals" hovercolor="#00e676">Goals</DropdownItem>
           <DropdownItem to="/resume" hovercolor="#00e676">Resume</DropdownItem>
           <DropdownItem to="/contact" hovercolor="#ff6b6b">Contact</DropdownItem>
+          <DropdownItem to="/trading" hovercolor="#00e676">Trading</DropdownItem>
           <ExternalDropdownItem href="https://github.com/Lactoseandtolerance" target="_blank" rel="noopener noreferrer" hovercolor="#2464eb">GitHub</ExternalDropdownItem>
           <ExternalDropdownItem href="https://www.linkedin.com/in/angel-nivar-a00740275/" target="_blank" rel="noopener noreferrer" hovercolor="#0077b5">LinkedIn</ExternalDropdownItem>
         </DropdownContent>

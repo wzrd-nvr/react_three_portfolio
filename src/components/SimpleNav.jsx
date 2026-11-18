@@ -113,6 +113,7 @@ const SimpleNav = () => {
         <DropdownItem to="/goals" hovercolor="#00e676">Goals</DropdownItem>
         <DropdownItem to="/resume" hovercolor="#00e676">Resume</DropdownItem>
         <DropdownItem to="/contact" hovercolor="#ff6b6b">Contact</DropdownItem>
+        <DropdownItem to="/trading" hovercolor="#00e676">Trading</DropdownItem>
         <ExternalDropdownItem 
           href="https://github.com/Lactoseandtolerance" 
           target="_blank" 

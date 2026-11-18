@@ -24,7 +24,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:rules": "npx --yes firebase-tools@15.26.0 emulators:exec --only firestore --project demo-trading-rules 'node --test firestore-tests/*.test.mjs'"
+    "test:rules": "npx --yes firebase-tools@15.26.0 emulators:exec --only firestore --project demo-trading-rules 'node --test firestore-tests/*.test.mjs'",
+    "emulators": "npx --yes firebase-tools@15.26.0 emulators:start --only firestore --project angelnivar-portfolio"
   },
   "eslintConfig": {
     "extends": [
@@ -46,5 +47,11 @@
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "6.0.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+    }
   }
 }
