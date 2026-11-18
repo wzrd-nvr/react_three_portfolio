@@ -1,0 +1,43 @@
+{
+  "data": {
+    "customer_approval_required": true,
+    "customer_approval_required_reason": "account_setting",
+    "limit_price": "1.00",
+    "market_data_disclosure": "Bid $350.22 \u00d7 80 K \u00b7 Ask $350.65 \u00d7 80 P \u00b7 Last $350.2197 \u00d7 60. Updated 7:59 PM ET.",
+    "order_checks": {
+      "alertType": "EQUITY_EXTREMELY_UNMARKETABLE_LIMIT_PRICE",
+      "equityExtremelyUnmarketableLimitPriceAlertDetails": {
+        "enteredPrice": {
+          "amount": "1.0000",
+          "currency": "USD"
+        },
+        "lastTradePrice": {
+          "amount": "350.3800",
+          "currency": "USD"
+        },
+        "side": "BUY"
+      }
+    },
+    "quantity": "1",
+    "quote_data": {
+      "adjusted_previous_close": "352.780000",
+      "ask_price": "351.520000",
+      "bid_price": "346.430000",
+      "has_traded": true,
+      "last_non_reg_trade_price": "350.219700",
+      "last_trade_price": "351.900000",
+      "previous_close": "352.780000",
+      "previous_close_date": "2026-11-16",
+      "state": "active",
+      "symbol": "AAPL",
+      "venue_ask_time": "2026-11-18T01:00:00.176205127Z",
+      "venue_bid_time": "2026-11-18T01:00:00.176205127Z",
+      "venue_last_non_reg_trade_time": "2026-11-18T00:59:36.037757806Z",
+      "venue_last_trade_time": "2026-11-17T20:59:59.985621652Z"
+    },
+    "side": "buy",
+    "symbol": "AAPL",
+    "type": "limit"
+  },
+  "guide": "This tool does NOT place the order. When customer_approval_required is true and order_checks is empty ({}), call place_equity_order immediately with the same parameters, presenting nothing and asking for no confirmation: this call does not execute the order, the customer sees it in the Robinhood app and approves or declines it there, so confirming here asks for the same consent twice. (remainder omitted)"
+}

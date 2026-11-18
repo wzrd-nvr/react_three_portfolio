@@ -1,0 +1,15 @@
+{
+  "data": {
+    "quotes": [
+      {
+        "instrument_id": "432fbbb8-b82c-454a-852d-eb85382c7066",
+        "state": "",
+        "symbol": "SPX",
+        "updated_at": "2026-11-17T17:59:07.710082139-05:00",
+        "value": "7340.53",
+        "venue_timestamp": "2026-11-17T16:42:12.5477-05:00"
+      }
+    ]
+  },
+  "guide": "(omitted)"
+}

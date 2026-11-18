@@ -1,0 +1,19 @@
+{
+  "data": {
+    "results": [
+      {
+        "instrument_id": "450dfc6d-5510-4d40-abfb-f633b7d9be3e",
+        "name": "Apple Inc. Common Stock",
+        "simple_name": "Apple",
+        "symbol": "AAPL"
+      },
+      {
+        "instrument_id": "125154ba-9c84-471b-be42-a108ee91dfce",
+        "name": "Apple Hospitality REIT, Inc.",
+        "simple_name": "Apple Hospitality REIT",
+        "symbol": "APLE"
+      }
+    ]
+  },
+  "guide": "(omitted)"
+}

@@ -1,0 +1,46 @@
+{
+  "data": {
+    "results": [
+      {
+        "average_volume": "50833772.619772",
+        "average_volume_2_weeks": "50833772.619772",
+        "average_volume_30_days": "47354221.862000",
+        "bounds": "regular",
+        "ceo": "John Ternus",
+        "description": "(trimmed company description)",
+        "distribution_frequency": "Quarterly",
+        "dividend_per_share": "0.270000",
+        "dividend_yield": "0.300471",
+        "ex_dividend_date": "2026-11-12",
+        "financial_status_description": "",
+        "financial_status_indicator": "CC0",
+        "float": "14514819488.799999",
+        "headquarters_city": "Cupertino",
+        "headquarters_state": "California",
+        "high": "355.360000",
+        "high_52_weeks": "360.830000",
+        "high_52_weeks_date": "2026-11-13",
+        "industry": "Telecommunications Equipment",
+        "low": "349.670000",
+        "low_52_weeks": "243.420000",
+        "low_52_weeks_date": "2026-01-20",
+        "market_cap": "5113881180000.000000",
+        "market_date": "2026-11-17",
+        "num_employees": 167000,
+        "open": "352.890000",
+        "overnight_volume": "0.000000",
+        "payable_date": "2026-11-16",
+        "pb_ratio": "45.736100",
+        "pe_ratio": "39.289016",
+        "record_date": "2026-11-12",
+        "sector": "Electronic Technology",
+        "shares_outstanding": "14532200000.000000",
+        "symbol": "AAPL",
+        "thirty_day_sec_yield": null,
+        "volume": "37407516.000000",
+        "year_founded": 1976
+      }
+    ]
+  },
+  "guide": "(omitted)"
+}

@@ -1,0 +1,42 @@
+{
+  "data": {
+    "results": [
+      {
+        "bars": [
+          {
+            "begins_at": "2026-11-13T00:00:00Z",
+            "close_price": "356.270000",
+            "high_price": "360.830000",
+            "low_price": "355.750000",
+            "open_price": "357.960000",
+            "session": "reg",
+            "volume": 40027467
+          },
+          {
+            "begins_at": "2026-11-16T00:00:00Z",
+            "close_price": "352.780000",
+            "high_price": "357.125000",
+            "low_price": "351.310000",
+            "open_price": "357.125000",
+            "session": "reg",
+            "volume": 50292161
+          },
+          {
+            "begins_at": "2026-11-17T00:00:00Z",
+            "close_price": "352.780000",
+            "high_price": "352.780000",
+            "interpolated": true,
+            "low_price": "352.780000",
+            "open_price": "352.780000",
+            "session": "reg",
+            "volume": 0
+          }
+        ],
+        "bounds": "regular",
+        "interval": "day",
+        "symbol": "AAPL"
+      }
+    ]
+  },
+  "guide": "(omitted)"
+}

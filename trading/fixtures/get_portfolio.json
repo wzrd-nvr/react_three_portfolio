@@ -1,0 +1,24 @@
+{
+  "data": {
+    "buying_power": {
+      "buying_power": "15.0000",
+      "display_currency": "USD",
+      "unleveraged_buying_power": "15.0000"
+    },
+    "cash": "15",
+    "crypto_buying_power": {
+      "buying_power": "15.0000"
+    },
+    "crypto_value": "0",
+    "currency": "USD",
+    "equity_value": "0",
+    "event_contracts_value": "0",
+    "fixed_income_value": "0",
+    "futures_value": "0",
+    "mutual_funds_value": "0",
+    "options_value": "0",
+    "pending_deposits": "0",
+    "total_value": "15"
+  },
+  "guide": "(omitted)"
+}
