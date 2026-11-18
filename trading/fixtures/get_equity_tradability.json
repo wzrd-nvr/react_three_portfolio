@@ -1,0 +1,25 @@
+{
+  "data": {
+    "results": [
+      {
+        "account_type_tradabilities": [
+          {
+            "account_type": "individual",
+            "account_type_tradability": "tradable"
+          }
+        ],
+        "all_day_tradability": "tradable",
+        "country": "US",
+        "extended_hours_fractional_tradability": false,
+        "fractional_tradability": "tradable",
+        "name": "Apple Inc. Common Stock",
+        "short_selling_tradability": "tradable",
+        "simple_name": "Apple",
+        "state": "active",
+        "symbol": "AAPL",
+        "tradeable": true
+      }
+    ]
+  },
+  "guide": "(omitted)"
+}

@@ -1,0 +1,40 @@
+{
+  "data": {
+    "accounts": [
+      {
+        "account_number": "900000002",
+        "agentic_allowed": false,
+        "rhc_account_number": "800000002",
+        "rhs_account_number": "900000002"
+      },
+      {
+        "account_number": "900000003",
+        "agentic_allowed": false,
+        "rhs_account_number": "900000003"
+      },
+      {
+        "account_number": "900000004",
+        "agentic_allowed": false,
+        "rhs_account_number": "900000004"
+      },
+      {
+        "account_number": "900000001",
+        "affiliate": "rhf",
+        "agentic_allowed": true,
+        "brokerage_account_type": "individual",
+        "deactivated": false,
+        "is_default": false,
+        "management_type": "self_directed",
+        "nickname": "MCP",
+        "option_level": "option_level_2",
+        "permanently_deactivated": false,
+        "rhc_account_number": "800000001",
+        "rhs_account_number": "900000001",
+        "state": "active",
+        "type": "cash",
+        "unsettled_funds": "0.0000"
+      }
+    ]
+  },
+  "guide": "(omitted: long presentation guide for the model; see docs/robinhood-tools.md)"
+}

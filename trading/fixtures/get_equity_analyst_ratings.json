@@ -1,0 +1,19 @@
+{
+  "data": {
+    "results": [
+      {
+        "ratings": {
+          "high_price_target": "425.0000",
+          "low_price_target": "250.0000",
+          "mean_price_target": "348.5199",
+          "num_buy_ratings": 28,
+          "num_hold_ratings": 16,
+          "num_sell_ratings": 6,
+          "updated_at": "2026-11-07T01:49:36Z"
+        },
+        "symbol": "AAPL"
+      }
+    ]
+  },
+  "guide": "(omitted)"
+}

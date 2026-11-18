@@ -1,0 +1,32 @@
+{
+  "data": {
+    "results": [
+      {
+        "close": {
+          "date": "2026-11-17",
+          "interpolated": false,
+          "price": "351.91",
+          "source": "sip-list-exchange-close",
+          "symbol": "AAPL"
+        },
+        "quote": {
+          "adjusted_previous_close": "351.910000",
+          "ask_price": "350.440000",
+          "bid_price": "350.310000",
+          "has_traded": true,
+          "last_non_reg_trade_price": "350.380000",
+          "last_trade_price": "351.900000",
+          "previous_close": "351.910000",
+          "previous_close_date": "2026-11-17",
+          "state": "active",
+          "symbol": "AAPL",
+          "venue_ask_time": "2026-11-18T02:31:23.636054517Z",
+          "venue_bid_time": "2026-11-18T02:31:23.636054517Z",
+          "venue_last_non_reg_trade_time": "2026-11-18T02:31:17.199Z",
+          "venue_last_trade_time": "2026-11-17T20:59:59.985621652Z"
+        }
+      }
+    ]
+  },
+  "guide": "(omitted)"
+}

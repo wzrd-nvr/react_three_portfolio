@@ -1,0 +1,35 @@
+{
+  "data": {
+    "results": [
+      {
+        "eps": {
+          "actual": "2.680000",
+          "estimate": "2.470000"
+        },
+        "quarter": 3,
+        "report": {
+          "date": "2026-11-17",
+          "timing": "pm",
+          "verified": true
+        },
+        "symbol": "NVDA",
+        "year": 2027
+      },
+      {
+        "eps": {
+          "actual": null,
+          "estimate": "2.060000"
+        },
+        "quarter": 3,
+        "report": {
+          "date": "2026-11-17",
+          "timing": "pm",
+          "verified": true
+        },
+        "symbol": "SQM",
+        "year": 2026
+      }
+    ]
+  },
+  "guide": "(omitted; raw response had 24 entries, trimmed to 2)"
+}
